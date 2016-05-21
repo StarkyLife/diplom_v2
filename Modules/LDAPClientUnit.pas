@@ -546,8 +546,25 @@ implementation
   function LDAPClient.CompareAttributeValue(entryDN,
                                   attrName,
                                   attrValueToCompare : string) : LDAPClientStatus;
+  var
+    returnCode : ulong;
+    resTemp : LDAPClientStatus;
   begin
-  
-  end; 
+    returnCode := ldap_compare_s(pLDAPSession,
+                                 PChar(entryDN),
+                                 PChar(attrName),
+                                 PChar(attrValueToCompare));
+    if returnCode = LDAP_COMPARE_TRUE then
+    begin
+      resTemp.msg := 'True';
+      resTemp.numb := 0;
+    end
+    else
+    begin
+      resTemp.msg := 'False';
+      resTemp.numb := 1;
+    end;
+    result := resTemp;
+  end;
 
 end.
