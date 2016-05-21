@@ -1,0 +1,299 @@
+{ This unit contains LDAP wrapper class.
+
+  Author: Ismagilov Ilshat (student group 4410)
+  Email: ilshat.ismagilov2014@gmail.com
+  Organisation: KAI (kai.ru)
+
+  Version: 2.0
+}
+
+unit LDAPClientUnit;
+
+interface
+
+uses Windows, Classes, SysUtils, jwawinldap;
+
+const
+  MODIFY_TYPE_REPLACE   = 0;
+  MODIFY_TYPE_DELETE    = 1;
+
+type
+  { Type for LDAPClient status messages }
+  LDAPClientStatus = record
+    numb : integer;
+    msg : string;
+  end;
+
+  { Type for LDAPClient search data:
+    * array of entries
+    * entry is TList of LDAPAttrubte }
+  SearchDataType = array of TList;
+
+  //attrValuesArray = array of string;
+
+  { Class for attribute data }
+  LDAPAttribute = class
+    strict private
+      AttributeName : string;
+      AttributeValue : array of string;
+      AttributeValueCount : integer;
+
+      { Getter function }
+      function GetAttributeValue(index : integer) : string;
+
+      { Setter procedure }
+      procedure SetAttributeValue(index : integer; value : string); 
+    public
+      property Name : string
+          read AttributeName
+          write AttributeName;
+      property Value[index : integer] : string
+          read GetAttributeValue
+          write SetAttributeValue;
+      property ValueCount : integer
+          read AttributeValueCount;
+
+
+      { Constructor that initilize the LDAPAttribute object
+        * sets the length of AttributeValue array }
+      constructor Create(valueCount : integer);
+  end;
+
+  { Wrapper class to work with LDAP }
+  LDAPClient = class
+    strict private
+      pLDAPSession : PLDAP;
+
+      procedure AddAttributeToEntry(ldAttr : LDAPAttribute; nAttributeIndex : integer; var nEntry : array of PLDAPMod);
+
+      //TODO: Check functions
+      
+    public
+      { Initiates LDAP }
+      function Init(hostName : string;
+                  portNumber : integer) : LDAPClientStatus;
+
+      { Simple Bind Connect }
+      function ConnectSimple(userDN : string;
+                           password : string) : LDAPClientStatus;
+
+      { Disconnect from server }
+      procedure Disconnect();
+
+      { Search : result as out parameter
+        *send empty array to get all attributes }
+      function Search(catalogDN, filter : string;
+                                   attr : array of LDAPAttribute;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
+
+      { Add }
+      function AddEntry(entryDN : string;
+                      attr : array of LDAPAttribute) : LDAPClientStatus;
+
+      { Modify:
+        * modifyType = 0 (change attribute/attributes)
+        * modifyType = 1 (delete attribute/attributes) }
+      function ModifyEntry(entryDN : string;
+                 attrToModify : array of LDAPAttribute;
+                   modifyType : integer) : LDAPCLientStatus;
+
+      { Delete }
+      function DeleteEntry(entryDN : string) : LDAPClientStatus;
+
+      { Compare Values }
+      function CompareAttributeValue(entryDN,
+                                     attrName,
+                                     attrValueToCompare : string) : LDAPClientStatus;
+                                     
+  end;
+
+implementation
+  { --------------------------------------------------------
+    ------------------- IMPLEMENTATION ---------------------
+    ------------------- LDAPAttribute ----------------------
+    -------------------------------------------------------- }
+
+  { Constructor 
+    * sets the length of AttributeValue array }
+  constructor LDAPAttribute.Create(valueCount : integer);
+  begin
+    SetLength(AttributeValue, valueCount);
+    AttributeValueCount := valueCount;
+  end;
+
+  { Getter for one element of AttributeValue }
+  function LDAPAttribute.GetAttributeValue(index : integer) : string;
+  begin    
+    result := AttributeValue[index]; 
+  end;
+
+  { Setter for one element of AttributeValue }
+  procedure LDAPAttribute.SetAttributeValue(index : integer; value : string);
+  begin
+    AttributeValue[index] := value;
+  end;
+
+  { --------------------------------------------------------
+    ------------------- IMPLEMENTATION ---------------------
+    --------------------- LDAPClient -----------------------
+    -------------------------------------------------------- }
+
+  { ----------------- Init (public) ---------------------- }
+  function LDAPClient.Init(hostName : string;
+                         portNumber : integer) : LDAPClientStatus;
+  var
+    returnCode, version : ulong;
+    resTemp : LDAPClientStatus;
+  begin
+    resTemp.numb := 0;
+    resTemp.msg := 'Success';
+
+    pLDAPSession := ldap_init(PChar(hostName), portNumber);
+    if pLDAPSession = nil then
+      begin
+        resTemp.msg := 'LDAP Init fail!';
+        resTemp.numb := GetLastError();
+        result := resTemp;
+      end;
+
+    // Setting option LDAP Version
+
+    version := LDAP_VERSION3;
+    returnCode := ldap_set_option(pLDAPSession, LDAP_OPT_PROTOCOL_VERSION, @version);
+    if returnCode <> LDAP_SUCCESS then
+      begin
+        resTemp.msg := 'LDAP Set option fail!';
+        resTemp.numb := returnCode;
+        result := resTemp;
+      end;
+
+    result := resTemp;
+  end;
+
+  { ---------------- ConnectSimple (public) ---------------- }
+  function LDAPClient.ConnectSimple(userDN : string;
+                                  password : string) : LDAPClientStatus;
+  var
+    returnCode : ulong;
+    resTemp : LDAPClientStatus;
+    cred, myDn : pchar;
+  begin
+    resTemp.numb := 0;
+    resTemp.msg := 'Success';
+
+    // Connecting...
+    returnCode := ldap_connect(pLDAPSession, nil);
+    if returnCode <> LDAP_SUCCESS then
+      begin
+        resTemp.msg := 'LDAP Connect fail!';
+        resTemp.numb := returnCode;
+        result := resTemp;
+      end;
+
+    // Binding...
+    cred := PChar(password);
+    // Note: myDN := 'CN=Ilshat,CN=Users,DC=domain,DC=local';
+    //      or myDN := 'starkylife@domain.local';  
+    myDN := PChar(userDN);
+    returnCode := ldap_simple_bind_s(pLDAPSession, myDN, cred);
+    if returnCode <> LDAP_SUCCESS then
+      begin
+        resTemp.msg := 'LDAP Bind fail!';
+        resTemp.numb := returnCode;
+        result := resTemp;
+      end;
+      
+    result := resTemp;
+  end;
+
+  { ---------------- Disconnect (public) ------------------- }
+  procedure LDAPClient.Disconnect();
+  begin
+    ldap_unbind_s(pLDAPSession);
+  end;
+
+  { ---------------- Search (public) ----------------------- }
+  function LDAPClient.Search(catalogDN, filter : string;
+                                   attr : array of LDAPAttribute;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
+  begin
+
+  end;
+
+  { ---------------- AddEntry (public) -------------------- }
+  function LDAPClient.AddEntry(entryDN : string;
+                      attr : array of LDAPAttribute) : LDAPClientStatus;
+  var
+    returnCode, iAttribute : ulong;   
+    newEntry : array of PLDAPMod;
+    resTemp : LDAPClientStatus;
+  begin
+    resTemp.numb := 0;
+    resTemp.msg := 'Success';
+
+    SetLength(newEntry, Length(attr)+1);
+    
+    for iAttribute := 0 to Length(newEntry) - 2 do
+    begin
+     AddAttributeToEntry(attr[iAttribute], iAttribute, newEntry);
+    end;
+    newEntry[Length(newEntry) - 1] := nil;
+
+    returnCode := ldap_add_s(pLDAPSession, PChar(entryDN), newEntry);
+    if returnCode <> LDAP_SUCCESS then
+      begin
+        resTemp.msg := 'LDAP Add fail!';
+        resTemp.numb := returnCode;
+        result := resTemp;
+      end;
+      
+    result := resTemp;
+  end;
+
+  { ---------------- ModifyEntry (public) ------------------ }
+  function LDAPClient.ModifyEntry(entryDN : string;
+                 attrToModify : array of LDAPAttribute;
+                   modifyType : integer) : LDAPCLientStatus;
+  begin
+
+  end;
+
+  { ---------------- DeleteEntry (public) ------------------ }
+  function LDAPClient.DeleteEntry(entryDN : string) : LDAPClientStatus;
+  begin
+
+  end;
+
+  { ---------------- CompareAttributeValue (public) ------- }
+  function LDAPClient.CompareAttributeValue(entryDN,
+                                  attrName,
+                                  attrValueToCompare : string) : LDAPClientStatus;
+  begin
+  
+  end;
+
+  procedure LDAPClient.AddAttributeToEntry(ldAttr : LDAPAttribute;
+                                   nAttributeIndex : integer;
+                                    var nEntry: array of PLDAPMod);
+  var
+    attributeValues : array of pchar;
+    attributeMod : LDAPMod;
+    pMod : PLDAPMod;
+    jVals : integer;
+  begin
+    SetLength(attributeValues, ldAttr.ValueCount+1);
+    New(pMod);
+    //attributeMod := pMod^;
+    for jVals := 0 to Length(attributeValues)-2 do
+      begin
+        attributeValues[jVals] := PChar(ldAttr.Value[jVals]);
+      end;
+    attributeValues[Length(attributeValues)-1] := nil;
+
+    pMod^.mod_op := LDAP_MOD_ADD;
+    pMod^.mod_type := PChar(ldAttr.Name);
+    pMod^.modv_strvals := @attributeValues;
+
+    nEntry[nAttributeIndex] := pMod;
+  end;
+end.

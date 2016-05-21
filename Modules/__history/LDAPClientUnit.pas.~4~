@@ -1,0 +1,26 @@
+{ This unit contains LDAP wrapper class.
+
+  Author: Ismagilov Ilshat (student group 4410)
+  Email: ilshat.ismagilov2014@gmail.com
+  Organisation: KAI (kai.ru)
+
+  Version: 2.0
+}
+
+unit LDAPClientUnit;
+
+interface
+
+uses SysUtils, jwawinldap;
+
+type
+  LDAPClient = class
+    private
+
+    public
+    
+  end;
+
+implementation
+
+end.

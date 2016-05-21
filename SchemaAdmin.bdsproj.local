@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2016/05/18 10:16:57.525.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Unit7.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\GUI\MainPage.pas</Transaction>
+    <Transaction>2016/05/18 10:16:57.525.dfm,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Unit7.dfm=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\GUI\MainPage.dfm</Transaction>
+    <Transaction>2016/05/18 10:17:06.041.bdsproj,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Project8.bdsproj=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\SchemaAdmin.bdsproj</Transaction>
+    <Transaction>2016/05/18 10:26:02.145.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientUnit.pas</Transaction>
+    <Transaction>2016/05/18 10:27:24.549.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\ADSchema.pas</Transaction>
+    <Transaction>2016/05/18 10:28:03.548.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\ADSchema.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\ADSchemaUnit.pas</Transaction>
+    <Transaction>2016/05/21 12:04:57.370.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas</Transaction>
+    <Transaction>2016/05/21 12:13:38.853.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas=</Transaction>
+    <Transaction>2016/05/21 12:15:06.448.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas</Transaction>
+    <Transaction>2016/05/21 12:49:01.710.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas=</Transaction>
+    <Transaction>2016/05/21 12:50:37.142.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\HelpUnit_LDAPClient.pas</Transaction>
+  </Transactions>
+</BorlandProject>
