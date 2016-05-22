@@ -105,7 +105,7 @@ var
   
 begin
   // TODO: Setup method call parameters
-  catalogDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
+  {catalogDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
   filter := '(objectClass=classSchema)';
   SetLength(attr,2);
   attr[0] := LDAPAttribute.Create(1);
@@ -113,11 +113,11 @@ begin
   attr[1] := LDAPAttribute.Create(1);
   attr[1].Name := 'mayContain';
 
-  {catalogDN := 'CN=Users,DC=*,DC=*';
+  catalogDN := 'DC=*,DC=*';
   filter := '(objectClass=user)';
   setLength(attr,1);
   attr[0] := LDAPAttribute.Create(1);
-  attr[0].Name := 'cn';  }
+  attr[0].Name := 'cn';          }
 
   FLDAPClient.Init(TestHostName, TestPortNumber);
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);

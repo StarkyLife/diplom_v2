@@ -32,7 +32,7 @@ type
       { Private Function that tries to reconnect to server with current Client Info
          *if fails return false
          *if succeeds return true
-         *!!!called in new thread!!!}
+         *called in new thread}
       function TryConnect() : boolean;
 
       { Private Function that checks connection by sending simple query

@@ -141,6 +141,7 @@ implementation
   var
     returnCode, version : ulong;
     resTemp : LDAPClientStatus;
+    poi : array of pchar;
   begin
     resTemp.numb := 0;
     resTemp.msg := 'Success';
@@ -177,6 +178,12 @@ implementation
         result := resTemp;
         Exit;
       end;
+
+    ldap_set_option(pLDAPSession, LDAP_OPT_DNSDOMAIN_NAME, @poi);
+
+    returnCode := ldap_get_option(pLDAPSession, LDAP_OPT_DNSDOMAIN_NAME, @poi);
+
+    resTemp.msg := poi^;
     
     result := resTemp;
   end;

@@ -11,7 +11,8 @@ uses
   LDAPClientUnit in 'Modules\LDAPClientUnit.pas',
   ADSchemaUnit in 'Modules\ADSchemaUnit.pas',
   HelpUnit_LDAPClient in 'Modules\HelpUnit_LDAPClient.pas',
-  ADSchemaTypes in 'Modules\ADSchemaTypes.pas';
+  ADSchemaTypes in 'Modules\ADSchemaTypes.pas',
+  ADSchemaHelpUnit in 'Modules\ADSchemaHelpUnit.pas';
 
 {$R *.res}
 

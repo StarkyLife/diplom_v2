@@ -5,13 +5,6 @@ interface
 uses Windows, Classes;
 
 type
-
-  { Status model
-    *gets error number and forms output message }
-  ADSchemaStatus = class
-  
-  end;
-
   { Attribute model }
   ADAttribute = class
     strict private
@@ -107,8 +100,6 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADAttribute ------------------------
     -------------------------------------------------------- }
-
-  { Public }
   constructor ADAttribute.Create(attrName : string; attrValues : array of string);
   var
     i : integer;
@@ -119,14 +110,12 @@ implementation
       AttributeValues.Add(attrValues[i]);
   end;
 
-  { Public }
   constructor ADAttribute.Create(attrName : string);
   begin
     AttributeName := attrName;
     AttributeValues := TStringList.Create;
   end;
 
-  { Public }
   destructor ADAttribute.Destroy();
   begin
     if AttributeValues <> nil then
@@ -135,37 +124,31 @@ implementation
     inherited;
   end;
 
-  { Public }
   function ADAttribute.GetList() : TStringList;
   begin
     result := AttributeValues;
   end;
 
-  { Public }
   procedure ADAttribute.AddValue(value : string);
   begin
     AttributeValues.Add(value);
   end;
 
-  { Public }
   procedure ADAttribute.DeleteValue(valueIndex : integer);
   begin
     AttributeValues.Delete(valueIndex);
   end;
 
-  { Private }
   function ADAttribute.GetValuesCount() : integer;
   begin
     result := AttributeValues.Count;
   end;
 
-  { Private }
   function ADAttribute.GetValue(index : integer) : string;
   begin
     result := AttributeValues[index];
   end;
 
-  { Private }
   procedure ADAttribute.SetValue(index : integer; value : string);
   begin
     AttributeValues[index] := value;
@@ -175,15 +158,12 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADEntry ----------------------------
     -------------------------------------------------------- }
-
-  { Public }
   constructor ADEntry.Create(entrName : string);
   begin
     EntryName := entryName;
     EntryAttributes := TList.Create;
   end;
 
-  { Public }
   constructor ADEntry.Create(entrName : string; attrs : array of ADAttribute);
   var
     i : integer;
@@ -194,7 +174,6 @@ implementation
       EntryAttributes.Add(attrs[i]);
   end;
 
-  { Public }
   destructor ADEntry.Destroy();
   var
     i : integer;
@@ -213,38 +192,32 @@ implementation
     inherited;
   end;
 
-  { Public }
   function ADEntry.GetList() : TList;
   begin
     result := EntryAttributes;
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attribute : ADAttribute);  
   begin
     EntryAttributes.Add(attribute);
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attrName : string; attrValues : array of string);
   begin
     EntryAttributes.Add(ADAttribute.Create(attrName, attrValues));
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attrName : string);
   begin
     EntryAttributes.Add(ADAttribute.Create(attrName));
   end;
 
-  { Public }
   procedure ADEntry.DeleteAttribute(index : integer);
   begin
     ADAttribute(EntryAttributes[index]).Destroy;
     EntryAttributes.Delete(index);
   end;
 
-  { Public }
   procedure ADEntry.DeleteAttribute(name : string);
   var
     i : integer;
@@ -260,13 +233,11 @@ implementation
     end;
   end;
 
-  { Private }
   function ADEntry.GetAttributesCount() : integer;
   begin
     result := EntryAttributes.Count;
   end;
 
-  { Private }
   function ADEntry.GetAttribute(index : integer) : ADAttribute;
   begin
     result := ADAttribute(EntryAttributes[index]);
@@ -276,14 +247,11 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADEntryList ------------------------
     -------------------------------------------------------- }
-    
-  { Public }
   constructor ADEntryList.Create();
   begin
     Entries.Create;
   end;
 
-  { Public }
   destructor ADEntryList.Destroy();
   var
     i : integer;
@@ -304,38 +272,32 @@ implementation
     inherited;
   end;
 
-  { Public }
   function ADEntryList.GetList() : TList;
   begin
     result := Entries;
   end;
 
-  { Public }
   procedure ADEntryList.AddEntry(entry : ADEntry);
   begin
     Entries.Add(entry);
   end;
 
-  { Public }
   procedure ADEntryList.AddEntry(entryName : string);
   begin
     Entries.Add(ADEntry.Create(entryName));
   end;
 
-  { Public }
   procedure ADEntryList.AddEntry(entryName : string; attrs : array of ADAttribute);
   begin
     Entries.Add(ADEntry.Create(entryName, attrs));
   end;
 
-  { Public }
   procedure ADEntryList.DeleteEntry(index : integer);
   begin
     ADEntry(Entries[index]).Destroy;
     Entries.Delete(index);
   end;
 
-  { Public }
   procedure ADEntryList.DeleteEntry(name : string);
   var
     i : integer;
@@ -351,13 +313,11 @@ implementation
     end;
   end;
 
-  { Private }
   function ADEntryList.GetEntriesCount() : integer;
   begin
     result := Entries.Count;
   end;
 
-  { Private }
   function ADEntryList.GetEntry(index : integer) : ADEntry;
   begin
     result := ADEntry(Entries[index]);

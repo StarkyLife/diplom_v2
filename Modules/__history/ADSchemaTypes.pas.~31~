@@ -5,13 +5,6 @@ interface
 uses Windows, Classes;
 
 type
-
-  { Status model
-    *gets error number and forms output message }
-  ADSchemaStatus = class
-  
-  end;
-
   { Attribute model }
   ADAttribute = class
     strict private
@@ -276,7 +269,6 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADEntryList ------------------------
     -------------------------------------------------------- }
-    
   { Public }
   constructor ADEntryList.Create();
   begin

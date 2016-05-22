@@ -5,13 +5,6 @@ interface
 uses Windows, Classes;
 
 type
-
-  { Status model
-    *gets error number and forms output message }
-  ADSchemaStatus = class
-  
-  end;
-
   { Attribute model }
   ADAttribute = class
     strict private
@@ -175,15 +168,12 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADEntry ----------------------------
     -------------------------------------------------------- }
-
-  { Public }
   constructor ADEntry.Create(entrName : string);
   begin
     EntryName := entryName;
     EntryAttributes := TList.Create;
   end;
 
-  { Public }
   constructor ADEntry.Create(entrName : string; attrs : array of ADAttribute);
   var
     i : integer;
@@ -194,7 +184,6 @@ implementation
       EntryAttributes.Add(attrs[i]);
   end;
 
-  { Public }
   destructor ADEntry.Destroy();
   var
     i : integer;
@@ -213,38 +202,32 @@ implementation
     inherited;
   end;
 
-  { Public }
   function ADEntry.GetList() : TList;
   begin
     result := EntryAttributes;
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attribute : ADAttribute);  
   begin
     EntryAttributes.Add(attribute);
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attrName : string; attrValues : array of string);
   begin
     EntryAttributes.Add(ADAttribute.Create(attrName, attrValues));
   end;
 
-  { Public }
   procedure ADEntry.AddAttribute(attrName : string);
   begin
     EntryAttributes.Add(ADAttribute.Create(attrName));
   end;
 
-  { Public }
   procedure ADEntry.DeleteAttribute(index : integer);
   begin
     ADAttribute(EntryAttributes[index]).Destroy;
     EntryAttributes.Delete(index);
   end;
 
-  { Public }
   procedure ADEntry.DeleteAttribute(name : string);
   var
     i : integer;
@@ -276,7 +259,6 @@ implementation
     ------------------- IMPLEMENTATION ---------------------
     ------------------- ADEntryList ------------------------
     -------------------------------------------------------- }
-    
   { Public }
   constructor ADEntryList.Create();
   begin

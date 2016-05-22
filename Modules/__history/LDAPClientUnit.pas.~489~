@@ -141,6 +141,7 @@ implementation
   var
     returnCode, version : ulong;
     resTemp : LDAPClientStatus;
+    poi : array of pchar;
   begin
     resTemp.numb := 0;
     resTemp.msg := 'Success';

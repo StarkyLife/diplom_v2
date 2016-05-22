@@ -113,11 +113,11 @@ begin
   attr[1] := LDAPAttribute.Create(1);
   attr[1].Name := 'mayContain';
 
-  {catalogDN := 'CN=Users,DC=*,DC=*';
-  filter := '(objectClass=user)';
+  catalogDN := 'DC=domain,DC=local';
+  filter := '(&(objectClass=user)(cn=Ilshat))';
   setLength(attr,1);
   attr[0] := LDAPAttribute.Create(1);
-  attr[0].Name := 'cn';  }
+  attr[0].Name := 'cn';
 
   FLDAPClient.Init(TestHostName, TestPortNumber);
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);

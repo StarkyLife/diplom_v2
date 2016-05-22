@@ -6,8 +6,7 @@ uses Windows, Classes;
 
 type
 
-  { Status model
-    *gets error number and forms output message }
+  { Status model }
   ADSchemaStatus = class
   
   end;

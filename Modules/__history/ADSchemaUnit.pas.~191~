@@ -31,8 +31,7 @@ type
 
       { Private Function that tries to reconnect to server with current Client Info
          *if fails return false
-         *if succeeds return true
-         *!!!called in new thread!!!}
+         *if succeeds return true}
       function TryConnect() : boolean;
 
       { Private Function that checks connection by sending simple query
@@ -46,7 +45,7 @@ type
       property isActive : boolean
         read isSchemaActive;
 
-      //Constructor creates an object and connects to server: isActive = true
+      //Constructor creates an object and connects to server
       constructor Create(hostName, portNumber, userName, password: string); overload;
 
       //Just creating object: isActive = false. You need to use Connect procedure
@@ -76,8 +75,7 @@ implementation
   { Public }
   constructor ADSchema.Create(hostName, portNumber, userName, password: string);
   begin
-    //LDAPCLient connect
-    //isSchemaActive = true if connection established
+
   end;
 
   { Public }
@@ -113,8 +111,6 @@ implementation
   procedure ADSchema.Disconnect();
   begin
     //LDAPClient disconnect
-    
-    //set isSchemaActive = false
   end;
 
   { ----------------------------------------------
@@ -135,13 +131,9 @@ implementation
     //Simple query to check connection
     //if false then call Disconnect to clear memory
     //and set isSchemaActive = false
-    //return isSchemaActive
   end;
 
   { Private }
   procedure ADSchema.SetSchemaDN(dn : string);
-  begin
-    //parse the dn
-  end;
 
 end.
