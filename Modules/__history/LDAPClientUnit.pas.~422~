@@ -27,7 +27,7 @@ type
   { Type for LDAPClient search data:
     * array of entries
     * entry is TList of LDAPAttrubte }
-  ArrayOfLDAPAttributeList = array of TList;   
+  SearchDataType = array of TList;   
 
   { Class for attribute data }
   LDAPAttribute = class
@@ -80,7 +80,7 @@ type
         *send empty array to get all attributes }
       function Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
 
       { Add }
       function AddEntry(entryDN : string;
@@ -216,7 +216,7 @@ implementation
   { ---------------- Search (public) ----------------------- }
   function LDAPClient.Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
   var
     //Search
     returnCode, attrCount, iAttribute : ulong;
@@ -556,15 +556,15 @@ implementation
                                  PChar(attrValueToCompare));
     if returnCode = LDAP_COMPARE_TRUE then
     begin
-      resTemp.msg := 'True';
+      resTemp.msg := 'Compare true';
       resTemp.numb := 0;
     end
     else
     begin
-      resTemp.msg := 'False';
+      resTemp.msg := 'Compare false';
       resTemp.numb := 1;
     end;
-    result := resTemp;
+
   end;
 
 end.

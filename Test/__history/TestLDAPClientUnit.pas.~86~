@@ -96,7 +96,7 @@ end;
 procedure TestLDAPClient.TestSearch;
 var
   ReturnValue: LDAPClientStatus;
-  searchResult: ArrayOfLDAPAttributeList;
+  searchResult: SearchDataType;
   attr: array of LDAPAttribute;
   filter: string;
   catalogDN: string;
@@ -239,7 +239,6 @@ begin
   ReturnValue := FLDAPClient.CompareAttributeValue(entryDN, attrName, attrValueToCompare);
   FLDAPClient.Disconnect;
   // TODO: Validate method results
-  CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
 initialization

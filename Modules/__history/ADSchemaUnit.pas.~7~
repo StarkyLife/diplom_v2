@@ -11,7 +11,7 @@ unit ADSchemaUnit;
 
 interface
 
-uses Windows, Classes, SysUtils, ADSchemaTypes, LDAPClientUnit;
+uses LDAPClientUnit;
 
 type
 
@@ -23,7 +23,6 @@ type
 
   end;
 
-implementation  
-
+implementation
 
 end.

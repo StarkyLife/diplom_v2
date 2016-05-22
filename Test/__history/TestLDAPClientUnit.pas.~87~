@@ -96,7 +96,7 @@ end;
 procedure TestLDAPClient.TestSearch;
 var
   ReturnValue: LDAPClientStatus;
-  searchResult: ArrayOfLDAPAttributeList;
+  searchResult: SearchDataType;
   attr: array of LDAPAttribute;
   filter: string;
   catalogDN: string;

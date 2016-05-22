@@ -12,5 +12,6 @@
     <Transaction>2016/05/21 12:15:06.448.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas</Transaction>
     <Transaction>2016/05/21 12:49:01.710.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\LDAPClientHelpUnit.pas=</Transaction>
     <Transaction>2016/05/21 12:50:37.142.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\HelpUnit_LDAPClient.pas</Transaction>
+    <Transaction>2016/05/22 16:40:51.944.pas,C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator\My Documents\Borland Studio Projects\Diplom_v2\Modules\ADSchemaTypes.pas</Transaction>
   </Transactions>
 </BorlandProject>

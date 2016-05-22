@@ -80,7 +80,7 @@ type
         *send empty array to get all attributes }
       function Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
 
       { Add }
       function AddEntry(entryDN : string;
@@ -216,7 +216,7 @@ implementation
   { ---------------- Search (public) ----------------------- }
   function LDAPClient.Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
+                             var searchResult : SearchDataType) : LDAPClientStatus;
   var
     //Search
     returnCode, attrCount, iAttribute : ulong;

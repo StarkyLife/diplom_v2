@@ -62,8 +62,8 @@ var
   hostName: string;
 begin
   // TODO: Setup method call parameters
-  portNumber := TestPortNumber;
-  hostName := TestHostName;
+  portNumber := 389;
+  hostName := 'starkyli-1sqlu0.domain.local';
   ReturnValue := FLDAPClient.Init(hostName, portNumber);
 
   // TODO: Validate method results
@@ -77,9 +77,9 @@ var
   userDN: string;
 begin
   // TODO: Setup method call parameters
-  password := TestPassword;
+  password := 'pa$$w0rd';
   //userDN := 'CN=Ilshat,CN=Users,DC=domain,DC=local';
-  userDN := TestUserDN;
+  userDN := 'starkylife@domain.local';
   FLDAPClient.Init(TestHostName, TestPortNumber);
   ReturnValue := FLDAPClient.ConnectSimple(userDN, password);
   FLDAPClient.Disconnect;
@@ -96,7 +96,7 @@ end;
 procedure TestLDAPClient.TestSearch;
 var
   ReturnValue: LDAPClientStatus;
-  searchResult: ArrayOfLDAPAttributeList;
+  searchResult: SearchDataType;
   attr: array of LDAPAttribute;
   filter: string;
   catalogDN: string;
@@ -231,15 +231,9 @@ var
 begin
   // TODO: Setup method call parameters
   entryDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
-  attrName := 'cn';
-  attrValueToCompare := 'account';
 
-  FLDAPClient.Init(TestHostName, TestPortNumber);
-  FLDAPClient.ConnectSimple(TestUserDN, TestPassword);
   ReturnValue := FLDAPClient.CompareAttributeValue(entryDN, attrName, attrValueToCompare);
-  FLDAPClient.Disconnect;
   // TODO: Validate method results
-  CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
 initialization
