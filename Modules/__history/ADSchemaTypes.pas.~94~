@@ -186,7 +186,7 @@ implementation
   begin
     //Make case of all ADSchema errors
     case errorNumb of
-      1 : res := 'Cant set Schema DN!';  
+      1 : res := 'Cant set Schem DN!';  
     end;
 
     result := res;

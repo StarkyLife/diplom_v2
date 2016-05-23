@@ -100,7 +100,7 @@ type
 
 
       { Function adds new entry to schema }
-      function AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+      function AddEntry(entry : ADEntry) : ADSchemaStatus;
 
       { Function modifies Entry (only attributes that given) }
       function ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
@@ -301,7 +301,7 @@ implementation
   function ADSchema.GetAll(entrType : EntryType;
                        var status : ADSchemaStatus) : ADEntryList;
   begin
-    result := GetAll(entrType, [], status);
+
   end;
 
   { Function returns List of ADEntry with GIVEN attributes }
@@ -314,7 +314,7 @@ implementation
 
 
   { Function adds new entry to schema }
-  function ADSchema.AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+  function ADSchema.AddEntry(entry : ADEntry) : ADSchemaStatus;
   begin
 
   end;

@@ -101,6 +101,8 @@ var
   attr: array of LDAPAttribute;
   filter: string;
   catalogDN: string;
+  test : string;
+  testnumb : string;
 begin
   // TODO: Setup method call parameters
   catalogDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
@@ -109,7 +111,12 @@ begin
   attr[0] := LDAPAttribute.Create(1);
   attr[0].Name := 'cn';
   attr[1] := LDAPAttribute.Create(1);
-  attr[1].Name := 'mayContain';     
+  attr[1].Name := 'mayContain';
+
+  test := catalogDN;
+  
+  delete(test, 0, pos('DC',test));
+  testnumb := intToStr(testnumb);
 
   {catalogDN := 'CN=Users,DC=*,DC=*';
   filter := '(objectClass=user)';
@@ -123,7 +130,10 @@ begin
   FLDAPClient.Disconnect;             
 
   //test := LDAPAttribute(searchResult[0][0]).Value[0];
-  // TODO: Validate method results 
+  // TODO: Validate method results
+  CheckEquals('account',
+               LDAPAttribute(searchResult[0][0]).Value[0],
+               'Something wrong with returned search data!');
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 
 end;

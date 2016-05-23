@@ -100,7 +100,7 @@ type
 
 
       { Function adds new entry to schema }
-      function AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+      function AddEntry(entry : ADEntry) : ADSchemaStatus;
 
       { Function modifies Entry (only attributes that given) }
       function ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
@@ -299,45 +299,27 @@ implementation
 
   { Function returns List of ADEntry with ALL attributes }
   function ADSchema.GetAll(entrType : EntryType;
-                       var status : ADSchemaStatus) : ADEntryList;
-  begin
-    result := GetAll(entrType, [], status);
-  end;
+                       var status : ADSchemaStatus) : ADEntryList; overload;
 
   { Function returns List of ADEntry with GIVEN attributes }
   function ADSchema.GetAll(entrType : EntryType;
                       withAttr : array of string;
-                      var status : ADSchemaStatus) : ADEntryList;
-  begin
-
-  end;
+                      var status : ADSchemaStatus) : ADEntryList; overload;
 
 
   { Function adds new entry to schema }
-  function ADSchema.AddEntry(newEntry : ADEntry) : ADSchemaStatus;
-  begin
-
-  end;
+  function ADSchema.AddEntry(entry : ADEntry) : ADSchemaStatus;
 
   { Function modifies Entry (only attributes that given) }
   function ADSchema.ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
-  begin
-
-  end;
 
   { Function deletes all attributes in given ADEntryObject }
   function ADSchema.DeleteEntryAttributes(entryWithDeleteAttributes : ADEntry)
-                                                      : ADSchemaStatus;
-  begin
-
-  end;
+                                                      : ADSchemaStatus; overload;
 
   { Function deletes given attributes of entry with given name }
   function ADSchema.DeleteEntryAttributes(name : string;
                                      attrToDelete : array of string)
-                                                      : ADSchemaStatus;
-  begin
-  
-  end;
+                                                      : ADSchemaStatus; overload;
 
 end.

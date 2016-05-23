@@ -254,15 +254,7 @@ implementation
     resTemp.numb := 0;
     resTemp.msg := 'Success';
 
-    //------------ Check syntax of search filter ---------------
     returnCode := ldap_check_filter(pLDAPSession, PChar(filter));
-    if returnCode <> LDAP_SUCCESS then
-    begin
-      resTemp.numb := returnCode;
-      resTemp.msg := 'Wrong search filter!';
-      result := resTemp;
-      Exit;
-    end;
 
     //---------------------------------------------
     //----! Search Directory Get PLDAPMessage !----

@@ -100,7 +100,7 @@ type
 
 
       { Function adds new entry to schema }
-      function AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+      function AddEntry(entry : ADEntry) : ADSchemaStatus;
 
       { Function modifies Entry (only attributes that given) }
       function ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
