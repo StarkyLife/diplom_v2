@@ -24,8 +24,7 @@ type
       isSchemaActive : boolean;
 
       //Client Info
-      _HostName, _UserName, _Password : string;
-      _PortNumber : integer;
+      _HostName, _PortNumber, _UserName, _Password : string;
 
       //Schema Catalog DN
       SchemaDN : string;
@@ -85,7 +84,7 @@ implementation
                               var status : ADSchemaStatus);
   begin
     client := LDAPClient.Create;
-    Connect(hostName, userName, password, portNumber, status); 
+    Connect(hostName, portNumber, userName, password, status); 
   end;
 
   { Public }

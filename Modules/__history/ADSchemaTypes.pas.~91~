@@ -38,7 +38,7 @@ type
                          erMsg : string); overload;
 
       { Creates and sets pvErrorMsg=0 and pvErrorMsg=Success }
-      constructor Create(); overload;   
+      constructor Create(isSuccess : boolean); overload;   
 
   end;
 
@@ -159,7 +159,7 @@ implementation
   end;
 
   { Public }
-  constructor ADSchemaStatus.Create();
+  constructor ADSchemaStatus.Create(isSuccess : boolean);
   begin
     pvErrorNumb := 0;
     pvErrorType := SuccessStatus;
@@ -185,10 +185,7 @@ implementation
     res : string;
   begin
     //Make case of all ADSchema errors
-    case errorNumb of
-      1 : res := 'Cant set Schem DN!';  
-    end;
-
+    
     result := res;
   end;
 

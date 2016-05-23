@@ -38,7 +38,7 @@ type
                          erMsg : string); overload;
 
       { Creates and sets pvErrorMsg=0 and pvErrorMsg=Success }
-      constructor Create(); overload;   
+      constructor Create(isSuccess : boolean); overload;   
 
   end;
 

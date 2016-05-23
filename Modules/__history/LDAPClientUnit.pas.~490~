@@ -99,7 +99,7 @@ type
       { Compare Values }
       function CompareAttributeValue(entryDN,
                                      attrName,
-                                     attrValueToCompare : string) : boolean;
+                                     attrValueToCompare : string) : LDAPClientStatus;
                                      
   end;
   
@@ -557,9 +557,10 @@ implementation
   { ---------------- CompareAttributeValue (public) ------- }
   function LDAPClient.CompareAttributeValue(entryDN,
                                   attrName,
-                                  attrValueToCompare : string) : boolean;
+                                  attrValueToCompare : string) : LDAPClientStatus;
   var
     returnCode : ulong;
+    resTemp : LDAPClientStatus;
   begin
     returnCode := ldap_compare_s(pLDAPSession,
                                  PChar(entryDN),
@@ -567,13 +568,15 @@ implementation
                                  PChar(attrValueToCompare));
     if returnCode = LDAP_COMPARE_TRUE then
     begin
-      result := true;
+      resTemp.msg := 'True';
+      resTemp.numb := 0;
     end
     else
     begin
-      result := false;
+      resTemp.msg := 'False';
+      resTemp.numb := 1;
     end;
-
+    result := resTemp;
   end;
 
 end.

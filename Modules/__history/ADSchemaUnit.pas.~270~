@@ -24,8 +24,7 @@ type
       isSchemaActive : boolean;
 
       //Client Info
-      _HostName, _UserName, _Password : string;
-      _PortNumber : integer;
+      _HostName, _PortNumber, _UserName, _Password : string;
 
       //Schema Catalog DN
       SchemaDN : string;
@@ -52,7 +51,7 @@ type
         read isSchemaActive;
 
       //Constructor creates an object and connects to server: isActive = true
-      constructor Create(hostName, userName, password: string; portNumber : integer;
+      constructor Create(hostName, portNumber, userName, password: string;
                             var status : ADSchemaStatus); overload;
 
       //Just creating object: isActive = false. You need to use Connect procedure
@@ -62,7 +61,7 @@ type
       destructor Destroy(); override;
 
       //Connects to server: if success changes isActive to True
-      procedure Connect(hostName, userName, password: string; portNumber : integer;
+      procedure Connect(hostName, portNumber, userName, password: string;
                           var status : ADSchemaStatus);
 
       { Disconnects from server
@@ -81,11 +80,11 @@ implementation
     -------------------------------------------------------- }
 
   { Public }
-  constructor ADSchema.Create(hostName, userName, password: string; portNumber : integer;
+  constructor ADSchema.Create(hostName, portNumber, userName, password: string;
                               var status : ADSchemaStatus);
   begin
     client := LDAPClient.Create;
-    Connect(hostName, userName, password, portNumber, status); 
+    Connect(hostName, portNumber, userName, password, status); 
   end;
 
   { Public }
@@ -109,7 +108,7 @@ implementation
   end;
 
   { Public }
-  procedure ADSchema.Connect(hostName, userName, password: string; portNumber : integer;
+  procedure ADSchema.Connect(hostName, userName, password: string; portNumber : integer
                               var status : ADSchemaStatus);
   begin
     if status <> nil then

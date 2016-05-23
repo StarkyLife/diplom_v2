@@ -231,7 +231,7 @@ end;
 
 procedure TestLDAPClient.TestCompareAttributeValue;
 var
-  ReturnValue: boolean;
+  ReturnValue: LDAPClientStatus;
   attrValueToCompare: string;
   attrName: string;
   entryDN: string;
@@ -246,7 +246,7 @@ begin
   ReturnValue := FLDAPClient.CompareAttributeValue(entryDN, attrName, attrValueToCompare);
   FLDAPClient.Disconnect;
   // TODO: Validate method results
-  CheckEquals(true, ReturnValue, 'Error in query!');
+  CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
 initialization

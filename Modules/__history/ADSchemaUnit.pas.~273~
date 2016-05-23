@@ -85,7 +85,7 @@ implementation
                               var status : ADSchemaStatus);
   begin
     client := LDAPClient.Create;
-    Connect(hostName, userName, password, portNumber, status); 
+    Connect(hostName, portNumber, userName, password, status); 
   end;
 
   { Public }

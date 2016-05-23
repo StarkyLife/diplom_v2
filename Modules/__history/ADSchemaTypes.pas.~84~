@@ -38,7 +38,7 @@ type
                          erMsg : string); overload;
 
       { Creates and sets pvErrorMsg=0 and pvErrorMsg=Success }
-      constructor Create(); overload;   
+      constructor Create(isSuccess : boolean); overload;
 
   end;
 
@@ -152,14 +152,15 @@ implementation
     case erType of
       LDAPError: res := pvGetLDAPMsg(erNumb);
       ADSchemaError: res := pvGetADSchemaMsg(erNumb);
-    end;    
-
-    if res <> '' then
-      pvErrorMsg := erMsg + ' --- ' + res; 
+    end;
+    
+    if res <> nil then
+      if res <> '' then
+        pvErrorMsg := res; 
   end;
 
   { Public }
-  constructor ADSchemaStatus.Create();
+  constructor ADSchemaStatus.Create(isSuccess : boolean);
   begin
     pvErrorNumb := 0;
     pvErrorType := SuccessStatus;
@@ -167,7 +168,7 @@ implementation
   end;
 
   { Private }
-  function ADSchemaStatus.pvGetLDAPMsg(errorNumb : integer) : string;
+  function pvGetLDAPMsg(errorNumb : integer) : string;
   var
     res : string;
   begin
@@ -180,15 +181,11 @@ implementation
   end;
 
   { Private }
-  function ADSchemaStatus.pvGetADSchemaMsg(errorNumb : integer) : string;
+  function pvGetADSchemaMsg(errorNumb : integer) : string;
   var
     res : string;
   begin
     //Make case of all ADSchema errors
-    case errorNumb of
-      1 : res := 'Cant set Schem DN!';  
-    end;
-
     result := res;
   end;
 
