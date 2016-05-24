@@ -97,11 +97,10 @@ end;
 procedure TestLDAPClient.TestSearch;
 var
   ReturnValue: LDAPClientStatus;
-  searchResult: LDAPEntryArray;
+  searchResult: ArrayOfLDAPAttributeList;
   attr: array of LDAPAttribute;
   filter: string;
   catalogDN: string;
-  test : string;
 begin
   // TODO: Setup method call parameters
   catalogDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
@@ -123,9 +122,8 @@ begin
   ReturnValue := FLDAPClient.Search(catalogDN, filter, attr, searchResult);
   FLDAPClient.Disconnect;             
 
-  //test := searchResult[0].dn;
-  // TODO: Validate method results
-
+  //test := LDAPAttribute(searchResult[0][0]).Value[0];
+  // TODO: Validate method results 
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 
 end;

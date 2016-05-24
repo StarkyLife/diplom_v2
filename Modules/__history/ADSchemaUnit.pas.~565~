@@ -312,7 +312,7 @@ implementation
                        var status : ADSchemaStatus) : ADEntry;
   var
     entryDN, filter : string;
-    resTemp : ADEntryList;
+    
   begin
     //forming entry dn
     entryDN := 'CN=' + CNname + ',' + SchemaDN;
@@ -323,18 +323,17 @@ implementation
       AttributeEntry: filter := '(objectClass=attributeSchema)';
     end;
 
-    resTemp := pvGetEntries(entryDN, filter, withAttr, status);
 
-    //Check item count
-    if resTemp.EntriesCount <> 1 then
+    //parse Search Results and form return object
+    if Length(searchResults) <> 1 then
     begin
       status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
       result := nil;
-      resTemp.Destroy;
+      pvClearLDAPSearchResults(searchResults);  
       Exit;
     end;
 
-    result := resTemp.Items[0];
+
   end;
 
   { Public }

@@ -312,8 +312,26 @@ implementation
                        var status : ADSchemaStatus) : ADEntry;
   var
     entryDN, filter : string;
-    resTemp : ADEntryList;
+    attrs : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute, iValue : integer;
+    searchResults : LDAPEntryArray;
+    ldapStatus : LDAPClientStatus;
+    attributeIndex : integer;
   begin
+    //Check Connection
+    if pvCheckConnection = false then
+    begin
+      status := pvTryConnect;
+      if status.StatusType <> SuccessStatus then
+      begin
+        result := nil;
+        Exit;
+      end;
+    end;
+    if status <> nil then
+      status.Free;
+
     //forming entry dn
     entryDN := 'CN=' + CNname + ',' + SchemaDN;
 
@@ -323,18 +341,47 @@ implementation
       AttributeEntry: filter := '(objectClass=attributeSchema)';
     end;
 
-    resTemp := pvGetEntries(entryDN, filter, withAttr, status);
-
-    //Check item count
-    if resTemp.EntriesCount <> 1 then
+    //forming attributes array
+    SetLength(attrs, Length(withAttr));
+    for iAttribute := 0 to Length(withAttr) - 1 do
     begin
-      status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
+      attr := LDAPAttribute.Create(0);
+      attr.Name := withAttr[iAttribute];
+      attrs[iAttribute] := attr;
+    end; 
+      
+    //Call LDAPClient function
+    ldapStatus := client.Search(entryDN, filter, attrs, searchResults);
+    if ldapStatus.numb <> 0 then
+    begin 
+      status := ADSchemaStatus.Create(ldapStatus.numb, LDAPError, ldapStatus.msg);
       result := nil;
-      resTemp.Destroy;
       Exit;
     end;
 
-    result := resTemp.Items[0];
+    //parse Search Results and form return object
+    if Length(searchResults) <> 1 then
+    begin
+      status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
+      result := nil;
+      pvClearLDAPSearchResults(searchResults);  
+      Exit;
+    end;
+
+    Result := ADEntry.Create(CNname);
+    for iAttribute := 0 to searchResults[0].attributes.Count - 1 do
+    begin
+      attr := LDAPAttribute(searchResults[0].attributes[iAttribute]);
+
+      attributeIndex := result.AddAttribute(attr.Name);
+      for iValue := 0 to attr.ValueCount - 1 do
+        result.Attributes[attributeIndex].AddValue(attr.Value[iValue]);  
+    end;
+
+    //Clearing return values of client.Search
+    pvClearLDAPSearchResults(searchResults);  
+
+    status := ADSchemaStatus.Create;
   end;
 
   { Public }
@@ -362,7 +409,7 @@ implementation
       AttributeEntry: filter := '(objectClass=attributeSchema)';
     end;
 
-    result := pvGetEntries(entryDN, filter, withAttr, status); 
+
   end;
 
   { Public }
@@ -469,7 +516,7 @@ implementation
     end;
 
     //Call LDAPClient function
-    ldapStatus := client.Search(entryDN, searchFilter, attrs, searchResults);
+    ldapStatus := client.Search(entryDN, filter, attrs, searchResults);
     if ldapStatus.numb <> 0 then
     begin 
       status := ADSchemaStatus.Create(ldapStatus.numb, LDAPError, ldapStatus.msg);

@@ -325,7 +325,7 @@ implementation
 
     resTemp := pvGetEntries(entryDN, filter, withAttr, status);
 
-    //Check item count
+    //parse Search Results and form return object
     if resTemp.EntriesCount <> 1 then
     begin
       status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
@@ -334,7 +334,7 @@ implementation
       Exit;
     end;
 
-    result := resTemp.Items[0];
+
   end;
 
   { Public }

@@ -328,7 +328,6 @@ implementation
   function ADEntry.AddAttribute(attrName : string) : integer;
   begin  
     EntryAttributes.Add(ADAttribute.Create(attrName));
-    result := EntryAttributes.Count - 1;
   end;
 
   { Public }
@@ -405,24 +404,24 @@ implementation
   end;
 
   { Public }
-  function ADEntryList.AddEntry(entry : ADEntry) : integer;
-  begin  
-    Entries.Add(entry);
-    result := Entries.Count - 1;
-  end;
-
-  { Public }
-  function ADEntryList.AddEntry(entryName : string) : integer;
-  begin   
-    Entries.Add(ADEntry.Create(entryName));
-    result := Entries.Count - 1;
-  end;
-
-  { Public }
-  function ADEntryList.AddEntry(entryName : string; attrs : array of ADAttribute) : integer;
+  function ADEntryList.AddEntry(entry : ADEntry) : ADEntry;
   begin
-    Entries.Add(ADEntry.Create(entryName, attrs));
-    result := Entries.Count - 1;
+    result := entry;
+    Entries.Add(result);
+  end;
+
+  { Public }
+  function ADEntryList.AddEntry(entryName : string) : ADEntry;
+  begin
+    result := ADEntry.Create(entryName);
+    Entries.Add(result);
+  end;
+
+  { Public }
+  function ADEntryList.AddEntry(entryName : string; attrs : array of ADAttribute) : ADEntry;
+  begin
+    result := ADEntry.Create(entryName, attrs);
+    Entries.Add(result);
   end;
 
   { Public }

@@ -2,6 +2,6 @@
 <BorlandProject>
 	<Transactions/>
 	<Default.Personality>
-		<Projects ActiveProject="SchemaAdmin.exe"/>
+		<Projects ActiveProject="SchemaAdminTests.exe"/>
 	</Default.Personality>
 </BorlandProject>

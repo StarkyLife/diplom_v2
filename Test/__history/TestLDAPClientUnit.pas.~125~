@@ -123,7 +123,7 @@ begin
   ReturnValue := FLDAPClient.Search(catalogDN, filter, attr, searchResult);
   FLDAPClient.Disconnect;             
 
-  //test := searchResult[0].dn;
+  test := LDAPAttribute(searchResult[0][0]).Value[0];
   // TODO: Validate method results
 
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);

@@ -24,16 +24,15 @@ type
     msg : string;
   end;
 
-  { Entry type }
   LDAPEntry = record
     dn : string;
-    attributes : TList;
+    attributes : array of TList;
   end;
 
   { Type for LDAPClient search data:
     * array of entries
-    * attributes is a TList of LDAPAttribute }
-  LDAPEntryArray = array of LDAPEntry; 
+    * entry is TList of LDAPAttrubte }
+  ArrayOfLDAPAttributeList = array of LDAPEntry; 
 
   { Class for attribute data }
   LDAPAttribute = class
@@ -86,7 +85,7 @@ type
         *send empty array to get all attributes }
       function Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : LDAPEntryArray) : LDAPClientStatus;
+                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
 
       { Add }
       function AddEntry(entryDN : string;
@@ -234,7 +233,7 @@ implementation
   { ---------------- Search (public) ----------------------- }
   function LDAPClient.Search(catalogDN, filter : string;
                                    attr : array of LDAPAttribute;
-                             var searchResult : LDAPEntryArray) : LDAPClientStatus;
+                             var searchResult : ArrayOfLDAPAttributeList) : LDAPClientStatus;
   var
     //Search
     returnCode, attrCount, iAttribute : ulong;
@@ -320,7 +319,7 @@ implementation
     try
       for iCnt := 0 to entriesCount - 1 do
       begin
-        searchResult[iCnt].attributes := TList.Create;
+        searchResult[iCnt] := TList.Create;
 
         //Get the first/next entry
         if iCnt = 0 then pEntry := ldap_first_entry(pLDAPSession, pSearchResults)
@@ -335,7 +334,6 @@ implementation
         end;
 
         //use ldap_get_dn for entry name
-        searchResult[iCnt].dn := ldap_get_dn(pLDAPSession, pEntry);
         //and ldap_explode_dn to make array of it's elements
 
         //Get first attribute
@@ -380,7 +378,7 @@ implementation
           tempAttr.Name := attrName;
           for i := 0 to Length(attrValue) - 1 do
             tempAttr.Value[i] := attrValue[i];
-          searchResult[iCnt].attributes.Add(tempAttr);
+          searchResult[iCnt].Add(tempAttr);
         end;
 
         pBer := nil;

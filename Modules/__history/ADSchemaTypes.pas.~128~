@@ -413,7 +413,8 @@ implementation
 
   { Public }
   function ADEntryList.AddEntry(entryName : string) : integer;
-  begin   
+  begin
+    result := ;
     Entries.Add(ADEntry.Create(entryName));
     result := Entries.Count - 1;
   end;
@@ -421,6 +422,7 @@ implementation
   { Public }
   function ADEntryList.AddEntry(entryName : string; attrs : array of ADAttribute) : integer;
   begin
+    result := ;
     Entries.Add(ADEntry.Create(entryName, attrs));
     result := Entries.Count - 1;
   end;
