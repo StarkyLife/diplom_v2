@@ -302,6 +302,13 @@ implementation
       result := resTemp;
       Exit;
     end;
+    //DONE: free the LDAPAttribute Objects
+    if Length(attr) > 0 then
+      for iAttribute := 0 to Length(attr) - 1 do
+      begin
+        attr[iAttribute].Free;
+        attr[iAttribute] := nil;
+      end;                          
 
     //-------------------------------
     //------! Count Entries !--------
@@ -454,6 +461,12 @@ implementation
       attributesArray[iAttribute].Free;
       attributesArray[iAttribute] := nil;
     end;
+    for iAttribute := 0 to Length(attr) - 1 do
+    begin
+      attr[iAttribute].Free;
+      attr[iAttribute] := nil;
+    end;
+
 
     //Check if api call wass successfull
     if returnCode <> LDAP_SUCCESS then
@@ -539,6 +552,12 @@ implementation
       attributesArray[iAttribute].Free;
       attributesArray[iAttribute] := nil;
     end;
+    for iAttribute := 0 to Length(attrToModify) - 1 do
+    begin
+      attrToModify[iAttribute].Free;
+      attrToModify[iAttribute] := nil;
+    end;
+
 
     //Check if api call wass successfull
     if returnCode <> LDAP_SUCCESS then

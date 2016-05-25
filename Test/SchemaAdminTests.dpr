@@ -22,7 +22,11 @@ uses
   TestLDAPClientUnit in 'TestLDAPClientUnit.pas',
   LDAPClientUnit in '..\Modules\LDAPClientUnit.pas',
   jwawinldap in '..\Modules\jwawinldap.pas',
-  HelpUnit_LDAPClient in '..\Modules\HelpUnit_LDAPClient.pas';
+  HelpUnit_LDAPClient in '..\Modules\HelpUnit_LDAPClient.pas',
+  TestADSchemaUnit in 'TestADSchemaUnit.pas',
+  ADSchemaUnit in '..\Modules\ADSchemaUnit.pas',
+  ADSchemaHelpUnit in '..\Modules\ADSchemaHelpUnit.pas',
+  ADSchemaTypes in '..\Modules\ADSchemaTypes.pas';
 
 {$R *.RES}
 

@@ -1,0 +1,568 @@
+{ This unit contains class for Active Directory Schema Manipulation.
+
+  Author: Ismagilov Ilshat (student group 4410)
+  Email: ilshat.ismagilov2014@gmail.com
+  Organisation: KAI (kai.ru)
+
+  Version: 2.0
+}
+
+unit ADSchemaUnit;
+
+interface
+
+uses Windows, Classes, SysUtils, ADSchemaTypes, ADSchemaHelpUnit, LDAPClientUnit;
+
+type
+  EntryType = (
+    ClassEntry,
+    AttributeEntry);
+
+  { Public class for administrating the Active Directory(AD) Schema }
+  ADSchema = class
+    strict private
+      //working with LDAPClient
+      client : LDAPClient;     
+
+      //Stores the state of connection
+      isSchemaActive : boolean;
+
+      //Client Info
+      _HostName, _UserName, _Password : string;
+      _PortNumber : integer;
+
+      //Schema Catalog DN
+      SchemaDN : string;
+      currentUserDN : string;
+
+      { Private function for establishing connection }
+      function pvEstablishConnection() : ADSchemaStatus;
+
+      { Private Function that tries to reconnect to server with current Client Info
+         *returns the statues of connection }
+      function pvTryConnect() : ADSchemaStatus;
+
+      { Private Function that checks connection by sending simple query
+         *if fails return false
+         *if succeeds return true}
+      function pvCheckConnection() : boolean;
+
+      { The only function that can change SchemaDN value!
+        *Returns true if success }
+      function pvSetSchemaDN() : boolean;
+
+      //working with LDAPClient - Clearing return values of Search
+      procedure pvClearLDAPSearchResults(var searchResults : LDAPEntryArray);
+
+      //search and get
+      function pvGetEntries(dn : string;
+                          filter : string;
+                          withAttr : array of string;
+                          var status : ADSchemaStatus) : ADEntryList;
+
+      //Checks if entry has all needed attributes
+      function pvCheckEntry(chEntry : ADEntry;
+               var neededAttributes : TStringList) : boolean;
+    public
+      property isActive : boolean
+        read isSchemaActive;
+
+      { -----------------------------------------------------------------
+        --------------------- Connection functions ---------------------- }
+
+      //Constructor creates an object and connects to server: isActive = true
+      constructor Create(hostName, userName, password: string; portNumber : integer;
+                            var status : ADSchemaStatus); overload;
+
+      //Just creating object: isActive = false. You need to use Connect procedure
+      constructor Create();overload;
+
+      //Destructor
+      destructor Destroy(); override;
+
+      //Connects to server: if success changes isActive to True
+      procedure Connect(hostName, userName, password: string; portNumber : integer;
+                          var status : ADSchemaStatus);
+
+      { Disconnects from server
+          *it also called from destructor if isActive=true }
+      procedure Disconnect();
+      
+
+      { -----------------------------------------------------------------
+        ---------------------- Data Handling Functions ------------------ }
+
+      { Function returns ADEntry object with all attributes }
+      function GetEntry(CNname : string;
+                         entrType : EntryType;
+                         var status : ADSchemaStatus) : ADEntry; overload;
+
+      { Function returns ADEntry object with given attributes }
+      function GetEntry(CNname : string;
+                       entrType : EntryType;
+                       withAttr : array of string;
+                       var status : ADSchemaStatus) : ADEntry; overload;
+
+      { Function returns List of ADEntry with ALL attributes }
+      function GetAll(entrType : EntryType;
+                       var status : ADSchemaStatus) : ADEntryList; overload;
+
+      { Function returns List of ADEntry with GIVEN attributes }
+      function GetAll(entrType : EntryType;
+                      withAttr : array of string;
+                      var status : ADSchemaStatus) : ADEntryList; overload;
+
+      { Search and get function with LDAP filter }
+      function GetEntries(filter : string;
+                          withAttr : array of string;
+                          var status : ADSchemaStatus) : ADEntryList;
+
+
+      { Function adds new entry to schema }
+      function AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+
+      { Function modifies Entry (only attributes that given) }
+      function ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
+
+      { Function deletes all attributes in given ADEntryObject }
+      function DeleteEntryAttributes(entryWithDeleteAttributes : ADEntry)
+                                                      : ADSchemaStatus; overload;
+
+      { Function deletes given attributes of entry with given name }
+      function DeleteEntryAttributes(name : string;
+                                     attrToDelete : array of string)
+                                                      : ADSchemaStatus; overload;
+
+  end;
+
+implementation  
+
+  { --------------------------------------------------------
+    ------------------- IMPLEMENTATION ---------------------
+    ------------------- ADSchema ---------------------------
+    -------------------------------------------------------- }
+
+  { Public }
+  constructor ADSchema.Create(hostName, userName, password: string; portNumber : integer;
+                              var status : ADSchemaStatus);
+  begin
+    client := LDAPClient.Create;
+    Connect(hostName, userName, password, portNumber, status); 
+  end;
+
+  { Public }
+  constructor ADSchema.Create();
+  begin
+    client := LDAPClient.Create;
+    isSchemaActive := false;
+  end;
+
+  { Public }
+  destructor ADSchema.Destroy(); 
+  begin
+    if isSchemaActive then
+    begin
+      Disconnect;
+    end;
+    if client <> nil then
+      client.Free;
+
+    inherited;
+  end;
+
+  { Public }
+  procedure ADSchema.Connect(hostName, userName, password: string; portNumber : integer;
+                              var status : ADSchemaStatus);
+  begin
+    if status <> nil then
+      status.free;
+      
+    //check in values
+
+    //set in values
+    _HostName := hostName;
+    _PortNumber := portNumber;
+    _UserName := userName;
+    _Password := password;
+
+    //establishConnection function
+    status := pvEstablishConnection();
+    if status.StatusType <> SuccessStatus then
+    begin
+      if isSchemaActive then
+        isSchemaActive := false;
+      Exit;
+    end;                  
+    isSchemaActive := true;
+
+    //Forming SchemaDN
+    if pvSetSchemaDN then
+    begin
+      status.Free;
+      status.Create(1, ADSchemaError, 'SetSchemaDN error!');        
+      isSchemaActive := false;
+      Disconnect;
+      Exit;
+    end;   
+    
+  end;
+
+  { Public }
+  procedure ADSchema.Disconnect();
+  begin
+    //LDAPClient disconnect
+    client.Disconnect;
+
+    isSchemaActive := false;
+  end;
+
+  { ----------------------------------------------
+    ------------- Private functions -------------- }
+  { Private }
+  function ADSchema.pvEstablishConnection() : ADSchemaStatus;
+  var
+    clientStatus : LDAPClientStatus;
+  begin
+    //LDAPCLient connect
+    clientStatus := client.Init(_HostName, _PortNumber);
+    if clientStatus.numb <> 0 then
+    begin
+      result := ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    clientStatus := client.ConnectSimple(_UserName, _Password);
+    if clientStatus.numb <> 0 then
+    begin
+      result := ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    result := ADSchemaStatus.Create();
+  end;
+
+  { Private }
+  function ADSchema.pvTryConnect() : ADSchemaStatus;
+  begin
+    //try to establishConnection
+    result := pvEstablishConnection;
+    //if connection is established
+    if result.StatusType = SuccessStatus then
+    begin
+      //set isSchemaActive = true
+      isSchemaActive := true;
+    end;
+
+  end;
+
+  { Private }
+  function ADSchema.pvCheckConnection() : boolean;
+  var
+    clientStatus : LDAPClientStatus;
+    searchResult : LDAPEntryArray;
+  begin
+    //Simple query to check connection
+    clientStatus := client.Search('CN=top,' + SchemaDN, '(objectClass=classSchema)', [], searchResult);
+
+    //if false then call Disconnect to clear memory
+    if clientStatus.numb <> 0 then
+    begin
+      Disconnect;
+    end;
+    //return isSchemaActive
+    result := isSchemaActive;
+  end;
+
+  { Private }
+  function ADSchema.pvSetSchemaDN() : boolean;
+  var
+    dn : string;
+    parsedDn : string;
+  begin
+    dn := GetUserNameExString(NameFullyQualifiedDN);
+
+    currentUserDN := dn;
+
+    //parse the dn
+    if pos('DC=', dn) = 0 then
+    begin
+      result := false;
+      Exit;
+    end;
+    parsedDn := copy(dn, pos('DC=', dn));
+    Insert('CN=Schema,CN=Configuration,', parsedDn, 0);
+
+    SchemaDN := parsedDn;
+    result := true;
+  end;
+
+  { -----------------------------------------------------------------
+    ---------------------- Data Handling Functions ------------------ }
+
+  { Public }  
+  { Function returns ADEntry object with all attributes }
+  function ADSchema.GetEntry(CNname : string;
+                    entrType : EntryType;
+                     var status : ADSchemaStatus) : ADEntry;
+  begin
+    result := GetEntry(CNname, entrType, [], status);
+  end;
+
+  { Public }
+  { Function returns ADEntry object with given attributes }
+  function ADSchema.GetEntry(CNname : string;
+                       entrType : EntryType;
+                       withAttr : array of string;
+                       var status : ADSchemaStatus) : ADEntry;
+  var
+    entryDN, filter : string;
+    resTemp : ADEntryList;
+  begin
+    //forming entry dn
+    entryDN := 'CN=' + CNname + ',' + SchemaDN;
+
+    //forming filter
+    case entrType of
+      ClassEntry: filter := '(objectClass=classSchema)';
+      AttributeEntry: filter := '(objectClass=attributeSchema)';
+    end;
+
+    resTemp := pvGetEntries(entryDN, filter, withAttr, status);
+
+    //Check item count
+    if resTemp.EntriesCount <> 1 then
+    begin
+      status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
+      result := nil;
+      resTemp.Destroy;
+      Exit;
+    end;
+
+    result := resTemp.Items[0];
+  end;
+
+  { Public }
+  { Function returns List of ADEntry with ALL attributes }
+  function ADSchema.GetAll(entrType : EntryType;
+                       var status : ADSchemaStatus) : ADEntryList;
+  begin
+    result := GetAll(entrType, [], status);
+  end;
+
+  { Public }
+  { Function returns List of ADEntry with GIVEN attributes }
+  function ADSchema.GetAll(entrType : EntryType;
+                      withAttr : array of string;
+                      var status : ADSchemaStatus) : ADEntryList;
+  var
+    entryDN, filter : string; 
+  begin
+    //forming entry dn
+    entryDN := SchemaDN;
+
+    //forming filter
+    case entrType of
+      ClassEntry: filter := '(objectClass=classSchema)';
+      AttributeEntry: filter := '(objectClass=attributeSchema)';
+    end;
+
+    result := pvGetEntries(entryDN, filter, withAttr, status); 
+  end;
+
+  { Public }
+  { Search and get function with LDAP filter }
+  function ADSchema.GetEntries(filter : string;
+                      withAttr : array of string;
+                         var status : ADSchemaStatus) : ADEntryList;
+  var
+    entryDN : string;
+  begin
+    entryDN := SchemaDN;
+    result := pvGetEntries(entryDN, filter, withAttr, status);   
+  end;
+
+  { Public }
+  { Function adds new entry to schema }
+  function ADSchema.AddEntry(newEntry : ADEntry) : ADSchemaStatus;
+  begin
+    //Check connection
+    //if connection lost exit
+    if pvCheckConnection = false then
+    begin
+      result := pvTryConnect;
+      if result.StatusType <> SuccessStatus then
+      begin
+        Exit;
+      end;
+    end;
+    if result <> nil then
+      result.Free;
+
+    //check given entry attributes
+    //if there is no all "must" attributes,
+      //exit with message of needed attributes
+
+    //form data for calling the LDAPClient function
+
+    //call LDAPClient AddEntry function
+    //check status
+    //if fail, form ADSchemaStatus with LDAPError
+    //if success, form ADSchemaStatus with SuccessStatus
+  end;
+
+  { Public }
+  { Function modifies Entry (only attributes that given) }
+  function ADSchema.ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
+  begin
+
+  end;
+
+  { Public }
+  { Function deletes all attributes in given ADEntryObject }
+  function ADSchema.DeleteEntryAttributes(entryWithDeleteAttributes : ADEntry)
+                                                      : ADSchemaStatus;
+  begin
+
+  end;
+
+  { Public }
+  { Function deletes given attributes of entry with given name }
+  function ADSchema.DeleteEntryAttributes(name : string;
+                                     attrToDelete : array of string)
+                                                      : ADSchemaStatus;
+  begin
+  
+  end;
+
+  { Private }
+  procedure ADSchema.pvClearLDAPSearchResults(var searchResults : LDAPEntryArray);
+  var
+    iEntry : integer;
+    iAttribute : integer;
+  begin
+    for iEntry := 0 to Length(searchResults) - 1 do
+    begin
+      for iAttribute := 0 to searchResults[iEntry].attributes.Count - 1 do
+      begin
+        LDAPAttribute(searchResults[iEntry].attributes).Free;
+      end;
+      searchResults[iEntry].attributes.Free;            
+    end;
+  end;
+
+  { Private }
+  //search and get
+  function ADSchema.pvGetEntries(dn : string;
+                          filter : string;
+                          withAttr : array of string;
+                          var status : ADSchemaStatus) : ADEntryList;
+  var
+    entryDN, searchFilter : string;
+    attrs : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute, iValue, iEntry : integer;
+    searchResults : LDAPEntryArray;
+    ldapStatus : LDAPClientStatus;
+    attributeIndex, entryIndex : integer;
+    parsedName : string;
+  begin
+    //Check Connection
+    if pvCheckConnection = false then
+    begin
+      status := pvTryConnect;
+      if status.StatusType <> SuccessStatus then
+      begin
+        result := nil;
+        Exit;
+      end;
+    end;
+    if status <> nil then
+      status.Free;
+
+    //forming entry dn
+    entryDN := dn;
+
+    //forming filter
+    searchFilter := filter;
+
+    //forming attributes array
+    SetLength(attrs, Length(withAttr));
+    for iAttribute := 0 to Length(withAttr) - 1 do
+    begin
+      attr := LDAPAttribute.Create(0);
+      attr.Name := withAttr[iAttribute];
+      attrs[iAttribute] := attr;
+    end;
+
+    //Call LDAPClient function
+    ldapStatus := client.Search(entryDN, searchFilter, attrs, searchResults);
+    if ldapStatus.numb <> 0 then
+    begin 
+      status := ADSchemaStatus.Create(ldapStatus.numb, LDAPError, ldapStatus.msg);
+      result := nil;
+      Exit;
+    end;
+
+    //parse Search Results and form return object
+    result := ADEntryList.Create;
+    for iEntry := 0 to Length(searchResults) - 1 do
+    begin
+      parsedName := searchResults[iEntry].dn;
+      //delete 'CN='
+      Delete(parsedName,0,3);
+      //copy
+      parsedName := copy(parsedName, 0, pos(',CN=', parsedName));
+
+      //create new entry
+      entryIndex := Result.AddEntry(parsedName);
+      for iAttribute := 0 to searchResults[iEntry].attributes.Count - 1 do
+      begin
+        attr := LDAPAttribute(searchResults[iEntry].attributes[iAttribute]);
+
+        attributeIndex := result.Items[entryIndex].AddAttribute(attr.Name);
+        for iValue := 0 to attr.ValueCount - 1 do
+          result.Items[entryIndex].Attributes[attributeIndex].AddValue(attr.Value[iValue]);
+      end;
+    end;
+
+    //Clearing return values of client.Search
+    pvClearLDAPSearchResults(searchResults);
+
+    status := ADSchemaStatus.Create; 
+  end;
+
+  { Private }
+  //Checks if entry has all needed attributes
+  function pvCheckEntry(chEntry : ADEntry;
+                        var neededAttributes : TStringList) : boolean;
+  var
+    iAttribute, iValue : integer;
+    objectClasses : array of string;
+  begin
+    //Check if 'objectClass' attriubute is set
+    for iAttribute := 0 to chEntry.AttributesCount - 1 do
+    begin
+      if chEntry.Attributes[iAttribute].Name = 'objectClass' then
+      begin
+        SetLength(objectClasses, chEntry.Attributes[iAttribute].ValuesCount);
+        for iValue := 0 to Length(objectClasses) - 1 do
+        begin
+          objectClasses[iValue] := chEntry.Attributes[iAttribute].Values[iValue];
+        end;
+        Break;
+      end;
+    end;
+
+    if Length(objectClasses) = 0 then
+    begin
+      neededAttributes.Add('objectClass');
+      result := false;
+      Exit;
+    end;
+
+    //Check existence of 'must' attributes
+
+  
+  end;
+
+end.

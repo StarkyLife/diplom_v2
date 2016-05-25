@@ -172,10 +172,12 @@ implementation
   var
     res : string;
   begin
-    //Make case of all LDAP errors { TODO 1 : make message for every error }
+    //Make case of all LDAP errors { TODO: make message for every error }
     case errorNumb of
-      1 : res := 'Indicates an internal error. The server is unable to respond with a more specific error and is also unable to properly respond to a request.';
+      1 : res := 'LDAP_OPERATIONS_ERROR: Indicates an internal error. The server is unable to respond with a more specific error and is also unable to properly respond to a request.';
+      2 : res := 'LDAP_PROTOCOL_ERROR: Indicates that the server has received an invalid or malformed request from the client.';
     end;
+    Insert('LDAP ERROR: ', res, 0);
 
     result := res;
   end;
@@ -188,8 +190,10 @@ implementation
     //Make case of all ADSchema errors
     case errorNumb of
       1 : res := 'Cant set Schema DN!';
-      2 : res := 'Cant parse search results!';  
+      2 : res := 'Cant parse search results!';
+      3 : res := 'There is no all needed attributes in Entry!';  
     end;
+    Insert('ADSchema ERROR: ', res, 0);
 
     result := res;
   end;
@@ -221,7 +225,10 @@ implementation
   destructor ADAttribute.Destroy();
   begin
     if AttributeValues <> nil then
+    begin
       AttributeValues.Free;
+      AttributeValues := nil;
+    end;     
 
     inherited;
   end;
@@ -270,7 +277,7 @@ implementation
   { Public }
   constructor ADEntry.Create(entrName : string);
   begin
-    EntryName := entryName;
+    EntryName := entrName;
     EntryAttributes := TList.Create;
   end;
 
@@ -279,7 +286,7 @@ implementation
   var
     i : integer;
   begin
-    EntryName := entryName;
+    EntryName := entrName;
     EntryAttributes := TList.Create;
     for i := 0 to Length(attrs) - 1 do
       EntryAttributes.Add(attrs[i]);
@@ -299,6 +306,7 @@ implementation
         EntryAttributes.Clear;  
       end;
       EntryAttributes.Free;
+      EntryAttributes := nil;
     end;
 
     inherited;
@@ -374,7 +382,7 @@ implementation
   { Public }
   constructor ADEntryList.Create();
   begin
-    Entries.Create;
+    Entries := TList.Create;
   end;
 
   { Public }
@@ -393,6 +401,7 @@ implementation
         Entries.Clear;
       end;
       Entries.Free;
+      Entries := nil;
     end;
 
     inherited;

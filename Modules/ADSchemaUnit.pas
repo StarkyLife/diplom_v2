@@ -59,6 +59,10 @@ type
                           filter : string;
                           withAttr : array of string;
                           var status : ADSchemaStatus) : ADEntryList;
+
+      //Checks if entry has all needed attributes
+      function pvCheckEntry(chEntry : ADEntry;
+               var neededAttributes : TStringList) : boolean;
     public
       property isActive : boolean
         read isSchemaActive;
@@ -114,13 +118,16 @@ type
                           var status : ADSchemaStatus) : ADEntryList;
 
 
-      { Function adds new entry to schema }
+      { Function adds new entry to schema
+        * given ADEntry object is not freed in function }
       function AddEntry(newEntry : ADEntry) : ADSchemaStatus;
 
-      { Function modifies Entry (only attributes that given) }
+      { Function modifies Entry (only attributes that given)
+        * given ADEntry object is not freed in function }
       function ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
 
-      { Function deletes all attributes in given ADEntryObject }
+      { Function deletes all attributes in given ADEntryObject
+        * given ADEntry object is not freed in function }
       function DeleteEntryAttributes(entryWithDeleteAttributes : ADEntry)
                                                       : ADSchemaStatus; overload;
 
@@ -128,7 +135,6 @@ type
       function DeleteEntryAttributes(name : string;
                                      attrToDelete : array of string)
                                                       : ADSchemaStatus; overload;
-
   end;
 
 implementation  
@@ -161,7 +167,10 @@ implementation
       Disconnect;
     end;
     if client <> nil then
+    begin
       client.Free;
+      client := nil;
+    end;            
 
     inherited;
   end;
@@ -170,8 +179,8 @@ implementation
   procedure ADSchema.Connect(hostName, userName, password: string; portNumber : integer;
                               var status : ADSchemaStatus);
   begin
-    if status <> nil then
-      status.free;
+    {if status <> nil then
+      status.free; }
       
     //check in values
 
@@ -192,10 +201,10 @@ implementation
     isSchemaActive := true;
 
     //Forming SchemaDN
-    if pvSetSchemaDN then
+    if not pvSetSchemaDN then
     begin
       status.Free;
-      status.Create(1, ADSchemaError, 'SetSchemaDN error!');        
+      status := ADSchemaStatus.Create(1, ADSchemaError, 'SetSchemaDN error!');        
       isSchemaActive := false;
       Disconnect;
       Exit;
@@ -247,8 +256,9 @@ implementation
     begin
       //set isSchemaActive = true
       isSchemaActive := true;
+      Exit;
     end;
-
+    isSchemaActive := false;
   end;
 
   { Private }
@@ -257,9 +267,17 @@ implementation
     clientStatus : LDAPClientStatus;
     searchResult : LDAPEntryArray;
   begin
+    //Check is Schema Active
+    if isSchemaActive = false then
+    begin
+      result := isSchemaActive;
+      Exit;
+    end;
+    
     //Simple query to check connection
     clientStatus := client.Search('CN=top,' + SchemaDN, '(objectClass=classSchema)', [], searchResult);
-
+    pvClearLDAPSearchResults(searchResult);
+    
     //if false then call Disconnect to clear memory
     if clientStatus.numb <> 0 then
     begin
@@ -301,6 +319,7 @@ implementation
                     entrType : EntryType;
                      var status : ADSchemaStatus) : ADEntry;
   begin
+
     result := GetEntry(CNname, entrType, [], status);
   end;
 
@@ -314,6 +333,8 @@ implementation
     entryDN, filter : string;
     resTemp : ADEntryList;
   begin
+
+      
     //forming entry dn
     entryDN := 'CN=' + CNname + ',' + SchemaDN;
 
@@ -328,6 +349,7 @@ implementation
     //Check item count
     if resTemp.EntriesCount <> 1 then
     begin
+      status.free;
       status := ADSchemaStatus.Create(2, ADSchemaError, 'Wrong number of entries');
       result := nil;
       resTemp.Destroy;
@@ -342,6 +364,8 @@ implementation
   function ADSchema.GetAll(entrType : EntryType;
                        var status : ADSchemaStatus) : ADEntryList;
   begin
+
+      
     result := GetAll(entrType, [], status);
   end;
 
@@ -353,6 +377,8 @@ implementation
   var
     entryDN, filter : string; 
   begin
+
+
     //forming entry dn
     entryDN := SchemaDN;
 
@@ -373,6 +399,8 @@ implementation
   var
     entryDN : string;
   begin
+
+
     entryDN := SchemaDN;
     result := pvGetEntries(entryDN, filter, withAttr, status);   
   end;
@@ -380,23 +408,174 @@ implementation
   { Public }
   { Function adds new entry to schema }
   function ADSchema.AddEntry(newEntry : ADEntry) : ADSchemaStatus;
-  begin
+  var
+    neededAttributes : TStringList;
+    clientStatus : LDAPClientStatus;
+    entryDN : string;
+    attributes : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute, iValue : integer;
+  begin     
 
+    //Check connection
+    //if connection lost exit
+    if pvCheckConnection = false then
+    begin
+      result := pvTryConnect;
+      if result.StatusType <> SuccessStatus then
+      begin
+        Exit;
+      end;
+      result.Free;
+      result := nil;
+    end;
+
+    //check given entry attributes
+    if pvCheckEntry(newEntry, neededAttributes) = false then
+    begin
+      //if there is no all "must" attributes,
+      //exit with message of needed attributes
+      Result := ADSchemaStatus.Create(3, ADSchemaError, neededAttributes.CommaText);
+      neededAttributes.Free;
+      neededAttributes := nil;
+      Exit;
+    end;
+
+    //form data for calling the LDAPClient function
+    entryDN := 'cn=' + newEntry.Name + ',' + SchemaDN;
+
+    SetLength(attributes, newEntry.AttributesCount);
+    for iAttribute := 0 to Length(attributes) - 1 do
+    begin
+      attr := LDAPAttribute.Create(newEntry.Attributes[iAttribute].ValuesCount);
+      attr.Name := newEntry.Attributes[iAttribute].Name;
+      for iValue := 0 to attr.ValueCount - 1 do
+      begin
+        attr.Value[iValue] := newEntry.Attributes[iAttribute].Values[iValue];
+      end;
+      attributes[iAttribute] := attr;
+    end;  
+
+    //call LDAPClient AddEntry function
+    clientStatus := client.AddEntry(entryDN, attributes);
+
+    //check status
+    if clientStatus.numb <> 0 then
+    begin
+      //if fail, form ADSchemaStatus with LDAPError
+      Result :=ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    //if success, form ADSchemaStatus with SuccessStatus
+    result := ADSchemaStatus.Create;
   end;
 
   { Public }
   { Function modifies Entry (only attributes that given) }
   function ADSchema.ModifyEntryAttributes(modifiedEntry : ADEntry) : ADSchemaStatus;
+  var 
+    clientStatus : LDAPClientStatus;
+    entryDN : string;
+    attributes : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute, iValue : integer;
   begin
+    //Check connection
+    //if connection lost exit
+    if pvCheckConnection = false then
+    begin
+      result := pvTryConnect;
+      if result.StatusType <> SuccessStatus then
+      begin
+        Exit;
+      end;
+      result.Free;
+      result := nil;
+    end;
+    
+    //form data for calling the LDAPClient function
+    entryDN := 'CN=' + modifiedEntry.Name + ',' + SchemaDN;
 
+    SetLength(attributes, modifiedEntry.AttributesCount);
+    for iAttribute := 0 to Length(attributes) - 1 do
+    begin
+      attr := LDAPAttribute.Create(modifiedEntry.Attributes[iAttribute].ValuesCount);
+      attr.Name := modifiedEntry.Attributes[iAttribute].Name;
+      for iValue := 0 to attr.ValueCount - 1 do
+      begin
+        attr.Value[iValue] := modifiedEntry.Attributes[iAttribute].Values[iValue];
+      end;
+      attributes[iAttribute] := attr;
+    end;  
+
+    //call LDAPClient ModfiyEntry function
+    clientStatus := client.ModifyEntry(entryDN, attributes, MODIFY_TYPE_REPLACE);
+
+    //check status
+    if clientStatus.numb <> 0 then
+    begin
+      //if fail, form ADSchemaStatus with LDAPError
+      Result := ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    //if success, form ADSchemaStatus with SuccessStatus
+    result := ADSchemaStatus.Create;
   end;
 
   { Public }
   { Function deletes all attributes in given ADEntryObject }
   function ADSchema.DeleteEntryAttributes(entryWithDeleteAttributes : ADEntry)
                                                       : ADSchemaStatus;
+  var 
+    clientStatus : LDAPClientStatus;
+    entryDN : string;
+    attributes : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute, iValue : integer;
   begin
+    //Check connection
+    //if connection lost exit
+    if pvCheckConnection = false then
+    begin
+      result := pvTryConnect;
+      if result.StatusType <> SuccessStatus then
+      begin
+        Exit;
+      end;
+      result.Free;
+      result := nil;
+    end;
+    
+    //form data for calling the LDAPClient function
+    entryDN := 'CN=' + entryWithDeleteAttributes.Name + ',' + SchemaDN;
 
+    SetLength(attributes, entryWithDeleteAttributes.AttributesCount);
+    for iAttribute := 0 to Length(attributes) - 1 do
+    begin
+      attr := LDAPAttribute.Create(entryWithDeleteAttributes.Attributes[iAttribute].ValuesCount);
+      attr.Name := entryWithDeleteAttributes.Attributes[iAttribute].Name;
+      for iValue := 0 to attr.ValueCount - 1 do
+      begin
+        attr.Value[iValue] := entryWithDeleteAttributes.Attributes[iAttribute].Values[iValue];
+      end;
+      attributes[iAttribute] := attr;
+    end;  
+
+    //call LDAPClient Modify function
+    clientStatus := client.ModifyEntry(entryDN, attributes, MODIFY_TYPE_DELETE);
+
+    //check status
+    if clientStatus.numb <> 0 then
+    begin
+      //if fail, form ADSchemaStatus with LDAPError
+      Result := ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    //if success, form ADSchemaStatus with SuccessStatus
+    result := ADSchemaStatus.Create;            
   end;
 
   { Public }
@@ -404,8 +583,50 @@ implementation
   function ADSchema.DeleteEntryAttributes(name : string;
                                      attrToDelete : array of string)
                                                       : ADSchemaStatus;
+  var
+    clientStatus : LDAPClientStatus;
+    entryDN : string;
+    attributes : array of LDAPAttribute;
+    attr : LDAPAttribute;
+    iAttribute : integer;
   begin
-  
+    //Check connection
+    //if connection lost exit
+    if pvCheckConnection = false then
+    begin
+      result := pvTryConnect;
+      if result.StatusType <> SuccessStatus then
+      begin
+        Exit;
+      end;
+      result.Free;
+      result := nil;
+    end;
+    
+    //form data for calling the LDAPClient function
+    entryDN := 'CN=' + name + ',' + SchemaDN;
+
+    SetLength(attributes, Length(attrToDelete));
+    for iAttribute := 0 to Length(attributes) - 1 do
+    begin
+      attr := LDAPAttribute.Create(0);
+      attr.Name := attrToDelete[iAttribute];        
+      attributes[iAttribute] := attr;
+    end;  
+
+    //call LDAPClient MofifyEntry function
+    clientStatus := client.ModifyEntry(entryDN, attributes, MODIFY_TYPE_DELETE);
+
+    //check status
+    if clientStatus.numb <> 0 then
+    begin
+      //if fail, form ADSchemaStatus with LDAPError
+      Result := ADSchemaStatus.Create(clientStatus.numb, LDAPError, clientStatus.msg);
+      Exit;
+    end;
+
+    //if success, form ADSchemaStatus with SuccessStatus
+    result := ADSchemaStatus.Create;
   end;
 
   { Private }
@@ -419,8 +640,10 @@ implementation
       for iAttribute := 0 to searchResults[iEntry].attributes.Count - 1 do
       begin
         LDAPAttribute(searchResults[iEntry].attributes).Free;
+        LDAPAttribute(searchResults[iEntry].attributes) := nil;
       end;
-      searchResults[iEntry].attributes.Free;            
+      searchResults[iEntry].attributes.Free;
+      searchResults[iEntry].attributes := nil;         
     end;
   end;
 
@@ -449,9 +672,13 @@ implementation
         result := nil;
         Exit;
       end;
+      if status <> nil then
+      begin
+        status.Free;
+        status := nil;
+      end;            
     end;
-    if status <> nil then
-      status.Free;
+
 
     //forming entry dn
     entryDN := dn;
@@ -502,7 +729,152 @@ implementation
     //Clearing return values of client.Search
     pvClearLDAPSearchResults(searchResults);
 
-    status := ADSchemaStatus.Create; 
+    status := ADSchemaStatus.Create;
+  end;
+
+  { Private }
+  //Checks if entry has all needed attributes
+  function ADSchema.pvCheckEntry(chEntry : ADEntry;
+                        var neededAttributes : TStringList) : boolean;
+  type
+    objectType = (notDefined, attributeType, classType);
+  var
+    iAttribute, iValue, i : integer;
+    objectClasses : array of string;
+    oType : objectType;
+    isCnExist,
+     isObjectClassesExist,
+      isGovernsIDExist,
+       isAttributeIDExist,
+        isAttributeSyntaxExist,
+         isOMSyntaxExist : boolean;
+  begin
+    //Check if 'cn' attribute is set
+    //Check if 'objectClass' attriubute is set
+    isCnExist := false;
+    isObjectClassesExist := false;
+    isGovernsIDExist := false;
+    isAttributeIDExist := false;
+    isAttributeSyntaxExist := false;
+    isOMSyntaxExist := false;
+    for iAttribute := 0 to chEntry.AttributesCount - 1 do
+    begin
+      if not isObjectClassesExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'objectClass' then
+          begin
+            SetLength(objectClasses, chEntry.Attributes[iAttribute].ValuesCount);
+            for iValue := 0 to Length(objectClasses) - 1 do
+            begin
+              objectClasses[iValue] := chEntry.Attributes[iAttribute].Values[iValue];
+            end;
+            isObjectClassesExist := true;
+          end;
+      end;
+
+      if not isCnExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'cn' then
+          isCnExist := true;
+      end;
+
+      if not isGovernsIDExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'governsID' then
+          isGovernsIDExist := true;
+      end;
+
+      if not isAttributeIDExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'attributeID' then
+          isAttributeIDExist := true;
+      end;
+
+      if not isAttributeSyntaxExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'attributeSyntax' then
+          isAttributeSyntaxExist := true;
+      end;
+
+      if not isOMSyntaxExist then
+      begin
+        if chEntry.Attributes[iAttribute].Name = 'oMSyntax' then
+          isOMSyntaxExist := true;
+      end;
+    end;
+
+    if not isCnExist then
+    begin
+      neededAttributes := TStringList.Create;
+      neededAttributes.Add('cn');
+      result := false;
+      Exit;
+    end;
+
+    if not isObjectClassesExist then
+    begin
+      neededAttributes := TStringList.Create;
+      neededAttributes.Add('objectClass');
+      result := false;
+      Exit;
+    end;
+
+    { write check of must attributes }
+    //Check existence of 'must' attributes
+    for  i := 0 to Length(objectClasses) - 1 do
+    begin
+      if objectClasses[i] = 'classSchema' then
+      begin
+        oType := classType;
+        Break;
+      end;
+      if objectClasses[i] = 'attributeSchema' then
+      begin
+        oType := attributeType;
+        Break;
+      end;               
+    end;
+
+    if oType = notDefined then
+    begin
+      neededAttributes := TStringList.Create;
+      neededAttributes.Add('classSchema');
+      neededAttributes.Add('attributeSchema');
+      result := false;
+      Exit;
+    end;
+
+    if oType = attributeType then
+    begin
+      { Check existence:
+        *attributeID
+        *attributeSyntax
+        *oMSyntax }
+        if not isAttributeIDExist or not isAttributeSyntaxExist or not isOMSyntaxExist then
+        begin
+          neededAttributes := TStringList.Create;
+          neededAttributes.Add('attributeID');
+          neededAttributes.Add('attributeSyntax');
+          neededAttributes.Add('oMSyntax');
+          result := false;
+          Exit;
+        end;
+    end;
+
+    if oType = classType then
+    begin
+      { Check existence:   
+        *governsID }
+      if not isGovernsIDExist then
+      begin
+        neededAttributes := TStringList.Create;
+        neededAttributes.Add('governsID');
+        result := false;
+        Exit;
+      end;
+    end;
+
+    result := true;
   end;
 
 end.

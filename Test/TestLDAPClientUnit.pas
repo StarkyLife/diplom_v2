@@ -61,12 +61,12 @@ var
   portNumber: Integer;
   hostName: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   portNumber := TestPortNumber;
   hostName := TestHostName;
   ReturnValue := FLDAPClient.Init(hostName, portNumber);
 
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
@@ -76,14 +76,14 @@ var
   password: string;
   userDN: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   password := TestPassword;
   //userDN := 'CN=Ilshat,CN=Users,DC=domain,DC=local';
   userDN := TestUserDN;
   FLDAPClient.Init(TestHostName, TestPortNumber);
   ReturnValue := FLDAPClient.ConnectSimple(userDN, password);
   FLDAPClient.Disconnect;
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 
 end;
@@ -91,7 +91,7 @@ end;
 procedure TestLDAPClient.TestDisconnect;
 begin
   FLDAPClient.Disconnect;
-  // TODO: Validate method results   
+  // DONE: Validate method results
 end;
 
 procedure TestLDAPClient.TestSearch;
@@ -103,7 +103,7 @@ var
   catalogDN: string;
   test : string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   catalogDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
   filter := '(objectClass=classSchema)';
   SetLength(attr,2);
@@ -124,7 +124,7 @@ begin
   FLDAPClient.Disconnect;             
 
   //test := searchResult[0].dn;
-  // TODO: Validate method results
+  // DONE: Validate method results
 
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 
@@ -136,7 +136,7 @@ var
   attr: array of LDAPAttribute;
   entryDN: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
 
   //Test Entry Data 1
   {entryDN := 'cn=JeffFirst,CN=Users,DC=domain,DC=local';
@@ -168,7 +168,7 @@ begin
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);
   ReturnValue := FLDAPClient.AddEntry(entryDN, attr);
   FLDAPClient.Disconnect;
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
@@ -179,7 +179,7 @@ var
   attrToModify: array of LDAPAttribute;
   entryDN: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   // Replace test
   entryDN := 'CN=LDAPClientTest,CN=Users,DC=domain,DC=local';
   modifyType := MODIFY_TYPE_REPLACE;
@@ -206,7 +206,7 @@ begin
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);  
   ReturnValue := FLDAPClient.ModifyEntry(entryDN, attrToModify, modifyType);
   FLDAPClient.Disconnect;
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(0, ReturnValue.numb, ReturnValue.msg);
 end;
 
@@ -215,14 +215,14 @@ var
   ReturnValue: LDAPClientStatus;
   entryDN: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   entryDN := 'CN=LDAPClientTest,CN=Users,DC=domain,DC=local';
 
   FLDAPClient.Init(TestHostName, TestPortNumber);
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);
   ReturnValue := FLDAPClient.DeleteEntry(entryDN);
   FLDAPClient.Disconnect;
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(0, returnValue.numb, ReturnValue.msg);
 end;
 
@@ -233,7 +233,7 @@ var
   attrName: string;
   entryDN: string;
 begin
-  // TODO: Setup method call parameters
+  // DONE: Setup method call parameters
   entryDN := 'CN=account,CN=Schema,CN=Configuration,DC=domain,DC=local';
   attrName := 'cn';
   attrValueToCompare := 'account';
@@ -242,7 +242,7 @@ begin
   FLDAPClient.ConnectSimple(TestUserDN, TestPassword);
   ReturnValue := FLDAPClient.CompareAttributeValue(entryDN, attrName, attrValueToCompare);
   FLDAPClient.Disconnect;
-  // TODO: Validate method results
+  // DONE: Validate method results
   CheckEquals(true, ReturnValue, 'Error in query!');
 end;
 
