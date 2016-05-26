@@ -291,19 +291,7 @@ begin
 end;
 
 procedure TestADSchema.TestActivateEntry;
-var
-  ReturnValue, status: ADSchemaStatus;
-  defunctEntryName : string;
 begin
-  defunctEntryName := 'MyTestClass';
-
-  FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
-  status.Free;
-  status := nil;
-  ReturnValue := FADSchema.ActivateEntry(defunctEntryName);
-  FADSchema.Disconnect;
-
-  CheckEquals(0, ReturnValue.StatusNumb, ReturnValue.StatusMsg);
 
 end;
 
@@ -312,7 +300,7 @@ var
   ReturnValue, status: ADSchemaStatus;
   activeEntryName : string;
 begin
-  activeEntryName := 'MyTestClass';
+  activeEntryName := 'MyTest3';
 
   FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
   status.Free;

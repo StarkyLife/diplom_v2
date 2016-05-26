@@ -642,7 +642,7 @@ implementation
     defunctEntry : ADEntry;
   begin
     defunctEntry := ADEntry.Create(defunctEntryName);
-    defunctEntry.AddAttribute('isDefunct', ['FALSE']);
+    defunctEntry.AddAttribute('isDefunct', ['TRUE']);
     Result := ModifyEntryAttributes(defunctEntry);
   end;
 
@@ -653,7 +653,7 @@ implementation
     activeEntry : ADEntry;
   begin
     activeEntry := ADEntry.Create(activeEntryName);
-    activeEntry.AddAttribute('isDefunct', ['TRUE']);
+    activeEntry.AddAttribute('isDefunct', ['FALSE']);
     Result := ModifyEntryAttributes(activeEntry);
   end;
 

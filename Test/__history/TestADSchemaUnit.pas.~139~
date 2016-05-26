@@ -295,7 +295,7 @@ var
   ReturnValue, status: ADSchemaStatus;
   defunctEntryName : string;
 begin
-  defunctEntryName := 'MyTestClass';
+  defunctEntryName := 'MyTest3';
 
   FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
   status.Free;
@@ -312,7 +312,7 @@ var
   ReturnValue, status: ADSchemaStatus;
   activeEntryName : string;
 begin
-  activeEntryName := 'MyTestClass';
+  activeEntryName := 'MyTest3';
 
   FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
   status.Free;

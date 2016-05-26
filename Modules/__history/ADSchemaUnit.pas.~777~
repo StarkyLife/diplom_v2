@@ -638,22 +638,17 @@ implementation
   { Public }
   { Function for activating defunct class or attribute }
   function ADSchema.ActivateEntry(defunctEntryName : string) : ADSchemaStatus;
-  var
-    defunctEntry : ADEntry;
   begin
-    defunctEntry := ADEntry.Create(defunctEntryName);
-    defunctEntry.AddAttribute('isDefunct', ['FALSE']);
-    Result := ModifyEntryAttributes(defunctEntry);
+
   end;
 
   { Public }
   { Function for deactivating active class or attribute }
   function ADSchema.DeactivateEntry(activeEntryName : string) : ADSchemaStatus;
-  var
-    activeEntry : ADEntry;
+  var activeEntry : ADEntry;
   begin
     activeEntry := ADEntry.Create(activeEntryName);
-    activeEntry.AddAttribute('isDefunct', ['TRUE']);
+    activeEntry.AddAttribute('isDefunct', ['FALSE']);
     Result := ModifyEntryAttributes(activeEntry);
   end;
 

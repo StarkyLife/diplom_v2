@@ -39,8 +39,6 @@ type
     procedure TestModifyEntryAttributes;
     procedure TestDeleteEntryAttributes;
     procedure TestDeleteEntryAttributes1;
-    procedure TestActivateEntry;
-    procedure TestDeactivateEntry;
   end;
 
 implementation
@@ -287,39 +285,6 @@ begin
   ReturnValue := FADSchema.DeleteEntryAttributes(name, attrToDelete);
   FADSchema.Disconnect;
   // DONE: Validate method results
-  CheckEquals(0, ReturnValue.StatusNumb, ReturnValue.StatusMsg);
-end;
-
-procedure TestADSchema.TestActivateEntry;
-var
-  ReturnValue, status: ADSchemaStatus;
-  defunctEntryName : string;
-begin
-  defunctEntryName := 'MyTestClass';
-
-  FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
-  status.Free;
-  status := nil;
-  ReturnValue := FADSchema.ActivateEntry(defunctEntryName);
-  FADSchema.Disconnect;
-
-  CheckEquals(0, ReturnValue.StatusNumb, ReturnValue.StatusMsg);
-
-end;
-
-procedure TestADSchema.TestDeactivateEntry;
-var
-  ReturnValue, status: ADSchemaStatus;
-  activeEntryName : string;
-begin
-  activeEntryName := 'MyTestClass';
-
-  FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
-  status.Free;
-  status := nil;
-  ReturnValue := FADSchema.DeactivateEntry(activeEntryName);
-  FADSchema.Disconnect;
-
   CheckEquals(0, ReturnValue.StatusNumb, ReturnValue.StatusMsg);
 end;
 
