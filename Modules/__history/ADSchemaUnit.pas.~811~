@@ -796,7 +796,7 @@ implementation
     parsedName : string;
     helpString : string;
   begin
-    helpString := 'abcdefghijklmnopqrstuvwxyz';  //26
+    helpString := 'abcdefghijklmnopqrstuvwxyz';
 
     //forming entry dn
     entryDN := dn;
@@ -837,7 +837,7 @@ implementation
         //delete 'CN='
         Delete(parsedName,1,3);
         //copy
-        parsedName := copy(parsedName, 1, pos(',CN=', parsedName)-1);
+        parsedName := copy(parsedName, 0, pos(',CN=', parsedName));
 
         //create new entry
         entryIndex := Result.AddEntry(parsedName);
@@ -853,7 +853,7 @@ implementation
 
       //Clearing return values of client.Search
       pvClearLDAPSearchResults(searchResults);
-      
+      SetLength(searchResults, 0);
     end;
 
     status := ADSchemaStatus.Create;

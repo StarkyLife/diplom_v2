@@ -321,12 +321,11 @@ implementation
     pEntry := nil;
     pBer := nil;
     pAttribute := nil;
-    ppValue := nil;     
+    ppValue := nil;
+    iValue := entriesCount;
     iValue := 0;
 
     try
-    if entriesCount <> 0 then
-    begin
       for iCnt := 0 to entriesCount - 1 do
       begin
         searchResult[iCnt].attributes := TList.Create;
@@ -394,7 +393,6 @@ implementation
 
         pBer := nil;
       end;
-    end;
     except
       on E : Exception do
         begin

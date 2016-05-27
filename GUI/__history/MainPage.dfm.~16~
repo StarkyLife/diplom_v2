@@ -13,7 +13,6 @@ object MainForm: TMainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
@@ -69,11 +68,7 @@ object MainForm: TMainForm
       Indent = 19
       TabOrder = 0
       OnChange = TreeViewMainChange
-      Items.NodeData = {
-        0101000000470000000000000000000000FFFFFFFFFFFFFFFF00000000000000
-        001741006300740069007600650020004400690072006500630074006F007200
-        7900200053006300680065006D006100}
-      ExplicitLeft = 0
+      ExplicitLeft = -5
       ExplicitTop = 7
     end
     object StringGridMain: TStringGrid

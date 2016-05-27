@@ -112,9 +112,9 @@ var
   status: ADSchemaStatus;
   withAttr: array of string;
   entrType: EntryType;
-  CNname: string; 
+  CNname: string;
 begin
-  CNname := 'Account';
+  CNname := 'account';
   entrType := ClassEntry;
   SetLength(withAttr, 1);
   withAttr[0] := 'mustContain';
@@ -125,7 +125,6 @@ begin
   status := nil;
   ReturnValue := FADSchema.GetEntry(CNname, entrType, withAttr, status);
   FADSchema.Disconnect;
-  
   // DONE: Validate method results
   CheckEquals(0, status.StatusNumb, status.StatusMsg);
 end;
@@ -211,7 +210,6 @@ begin
   newEntryClass.AddAttribute('objectClass', ['classSchema']);
   newEntryClass.AddAttribute('governsID', ['1.2.840.113556.1.8000.2554.13844.27782.13802.18569.40486.16667616.15992150']);
   newEntryClass.AddAttribute('mustContain', ['MyTest3']);
-  newEntryClass.AddAttribute('subClassOf', ['MyTest']);
 
   { You can add if u want }
   //newEntry.AddAttribute('subClassOf', ['top']);      

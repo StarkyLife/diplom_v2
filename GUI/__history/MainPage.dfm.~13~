@@ -13,9 +13,7 @@ object MainForm: TMainForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnClose = FormClose
   OnCreate = FormCreate
-  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
   object GridPanel1: TGridPanel
@@ -68,13 +66,6 @@ object MainForm: TMainForm
       Align = alClient
       Indent = 19
       TabOrder = 0
-      OnChange = TreeViewMainChange
-      Items.NodeData = {
-        0101000000470000000000000000000000FFFFFFFFFFFFFFFF00000000000000
-        001741006300740069007600650020004400690072006500630074006F007200
-        7900200053006300680065006D006100}
-      ExplicitLeft = 0
-      ExplicitTop = 7
     end
     object StringGridMain: TStringGrid
       Left = 182
@@ -83,8 +74,7 @@ object MainForm: TMainForm
       Height = 375
       Align = alClient
       ColCount = 2
-      FixedColor = clBtnHighlight
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
+      FixedCols = 0
       TabOrder = 1
       ColWidths = (
         64
@@ -100,16 +90,16 @@ object MainForm: TMainForm
     ButtonWidth = 89
     Caption = 'ToolBar1'
     TabOrder = 1
-    object AddButton: TToolButton
+    object ToolButton1: TToolButton
       Left = 0
       Top = 0
-      Caption = 'Add'
+      Caption = 'ToolButton1'
       ImageIndex = 0
     end
-    object ModifyButton: TToolButton
+    object ToolButton2: TToolButton
       Left = 89
       Top = 0
-      Caption = 'ModifyButton'
+      Caption = 'ToolButton2'
       ImageIndex = 1
     end
     object ToolButton3: TToolButton
@@ -120,16 +110,16 @@ object MainForm: TMainForm
       ImageIndex = 2
       Style = tbsSeparator
     end
-    object ActivateButton: TToolButton
+    object ToolButton4: TToolButton
       Left = 186
       Top = 0
-      Caption = 'ActivateButton'
+      Caption = 'ToolButton4'
       ImageIndex = 2
     end
-    object DeactivateButton: TToolButton
+    object ToolButton5: TToolButton
       Left = 275
       Top = 0
-      Caption = 'DeactivateButton'
+      Caption = 'ToolButton5'
       ImageIndex = 3
     end
     object ToolButton6: TToolButton
@@ -140,10 +130,10 @@ object MainForm: TMainForm
       ImageIndex = 4
       Style = tbsSeparator
     end
-    object RefreshButton: TToolButton
+    object ToolButton7: TToolButton
       Left = 372
       Top = 0
-      Caption = 'RefreshButton'
+      Caption = 'ToolButton7'
       ImageIndex = 4
     end
     object ToolButton8: TToolButton
@@ -154,16 +144,16 @@ object MainForm: TMainForm
       ImageIndex = 5
       Style = tbsSeparator
     end
-    object ConnectButton: TToolButton
+    object ToolButton9: TToolButton
       Left = 469
       Top = 0
-      Caption = 'ConnectButton'
+      Caption = 'ToolButton9'
       ImageIndex = 5
     end
-    object DisconnectButton: TToolButton
+    object ToolButton10: TToolButton
       Left = 558
       Top = 0
-      Caption = 'DisconnectButton'
+      Caption = 'ToolButton10'
       ImageIndex = 6
     end
     object ToolButton11: TToolButton
@@ -174,10 +164,10 @@ object MainForm: TMainForm
       ImageIndex = 7
       Style = tbsSeparator
     end
-    object ExitButton: TToolButton
+    object ToolButton12: TToolButton
       Left = 655
       Top = 0
-      Caption = 'ExitButton'
+      Caption = 'ToolButton12'
       ImageIndex = 7
     end
   end

@@ -105,7 +105,7 @@ var
   
 begin
   //Get Classes
-  entries := schema.GetAll(ClassEntry, ['cn'], status);
+  entries := schema.GetAll(ClassEntry, status);
   if status.StatusType <> SuccessStatus then
   begin
     //here error handling
@@ -121,7 +121,7 @@ begin
   entries := nil;
 
   //Get Attributes     !!!TODO: sizelimit in search operation exceeded
-  entries := schema.GetAll(AttributeEntry, ['cn'], status);
+  entries := schema.GetAll(AttributeEntry, status);
   if status.StatusType <> SuccessStatus then
   begin
     //here error handling

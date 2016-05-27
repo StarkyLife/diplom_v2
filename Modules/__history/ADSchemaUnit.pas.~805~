@@ -400,19 +400,7 @@ implementation
       AttributeEntry: filter := '(objectClass=attributeSchema)';
     end;
 
-    result := pvGetEntries(entryDN, filter, withAttr, status);
-    if status.StatusNumb = 4 then
-    begin
-      if result <> nil then
-      begin
-        result.Destroy;
-        result := nil;
-      end;
-      status.Free;
-      status := nil;
-
-      result := pvSearchExtended(entryDN, entrType, withAttr, status);
-    end;
+    result := pvGetEntries(entryDN, filter, withAttr, status); 
   end;
 
   { Public }
@@ -691,7 +679,6 @@ implementation
       searchResults[iEntry].attributes.Free;
       searchResults[iEntry].attributes := nil;         
     end;
-    SetLength(searchResults, 0);
   end;
 
   { Private }
@@ -796,7 +783,7 @@ implementation
     parsedName : string;
     helpString : string;
   begin
-    helpString := 'abcdefghijklmnopqrstuvwxyz';  //26
+    helpString := 'abcdefghijklmnopqrstuvwxyz';
 
     //forming entry dn
     entryDN := dn;
@@ -837,7 +824,7 @@ implementation
         //delete 'CN='
         Delete(parsedName,1,3);
         //copy
-        parsedName := copy(parsedName, 1, pos(',CN=', parsedName)-1);
+        parsedName := copy(parsedName, 0, pos(',CN=', parsedName));
 
         //create new entry
         entryIndex := Result.AddEntry(parsedName);
@@ -853,10 +840,9 @@ implementation
 
       //Clearing return values of client.Search
       pvClearLDAPSearchResults(searchResults);
-      
     end;
 
-    status := ADSchemaStatus.Create;
+
   
   end;
 

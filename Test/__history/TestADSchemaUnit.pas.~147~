@@ -112,7 +112,8 @@ var
   status: ADSchemaStatus;
   withAttr: array of string;
   entrType: EntryType;
-  CNname: string; 
+  CNname: string;
+  test : string;
 begin
   CNname := 'Account';
   entrType := ClassEntry;
@@ -125,7 +126,7 @@ begin
   status := nil;
   ReturnValue := FADSchema.GetEntry(CNname, entrType, withAttr, status);
   FADSchema.Disconnect;
-  
+  test := ReturnValue.Name;
   // DONE: Validate method results
   CheckEquals(0, status.StatusNumb, status.StatusMsg);
 end;

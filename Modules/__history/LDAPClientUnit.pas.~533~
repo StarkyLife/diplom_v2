@@ -325,7 +325,7 @@ implementation
     iValue := 0;
 
     try
-    if entriesCount <> 0 then
+    if entriesCount = 0 then
     begin
       for iCnt := 0 to entriesCount - 1 do
       begin

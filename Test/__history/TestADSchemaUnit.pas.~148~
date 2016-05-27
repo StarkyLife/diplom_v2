@@ -125,7 +125,7 @@ begin
   status := nil;
   ReturnValue := FADSchema.GetEntry(CNname, entrType, withAttr, status);
   FADSchema.Disconnect;
-  
+  test := ReturnValue.Name;
   // DONE: Validate method results
   CheckEquals(0, status.StatusNumb, status.StatusMsg);
 end;

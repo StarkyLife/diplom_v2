@@ -105,7 +105,7 @@ var
   
 begin
   //Get Classes
-  entries := schema.GetAll(ClassEntry, ['cn'], status);
+  entries := schema.GetAll(ClassEntry, status);
   if status.StatusType <> SuccessStatus then
   begin
     //here error handling
@@ -120,8 +120,8 @@ begin
   entries.Destroy;
   entries := nil;
 
-  //Get Attributes     !!!TODO: sizelimit in search operation exceeded
-  entries := schema.GetAll(AttributeEntry, ['cn'], status);
+  //Get Attributes
+  entries := schema.GetAll(AttributeEntry, status);
   if status.StatusType <> SuccessStatus then
   begin
     //here error handling
@@ -135,7 +135,6 @@ begin
     TreeViewMain.Items.AddChild(ATTRIBUTE_NODE, entries.Items[iEntry].Name);
   end;
   entries.Destroy;
-  entries := nil;
 
 end;
 
