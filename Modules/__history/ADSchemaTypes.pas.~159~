@@ -132,7 +132,12 @@ type
       constructor Create();
       destructor Destroy(); override;
   end;
-  
+
+  ADTree = class
+    parentName : string;
+    children : TList; //of ADTree;
+  end;
+
 implementation
 
   { --------------------------------------------------------

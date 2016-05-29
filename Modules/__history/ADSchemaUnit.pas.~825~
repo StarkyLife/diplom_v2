@@ -146,8 +146,7 @@ type
       function ActivateEntry(defunctEntryName : string) : ADSchemaStatus;
 
       { Function for deactivating active class or attribute }
-      function DeactivateEntry(activeEntryName : string) : ADSchemaStatus; 
-
+      function DeactivateEntry(activeEntryName : string) : ADSchemaStatus;
   end;
 
 implementation  

@@ -341,7 +341,7 @@ begin
       entries.Destroy;
       entries := nil;
 
-      // while loop to form other subclasses
+      // while loop to form other sublasses
       parentNode := curNode;
       curNode := curNode.getFirstChild;
       while curNode.Text <> 'top' do

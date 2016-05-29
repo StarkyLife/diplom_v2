@@ -312,7 +312,7 @@ begin
   //----------------------------------------------------------
   //---------------- Form Class Tree -----------------------
   // -----------------------------------------------------
-  curNode := TreeViewMain.Items.AddChild(TREE_NODE, 'top');
+  curNode := TreeViewMain.Items.AddChild(TREE_NODE, 'Top');
 
   //top class childs
   entries := schema.GetEntries('(&(objectClass=classSchema)(subClassOf=top))', ['cn'], status);
@@ -335,16 +335,15 @@ begin
     begin
       for iEntry := 0 to entries.EntriesCount - 1 do
       begin
-        if entries.Items[iEntry].Name <> 'Top' then
+        if entries.Items[iEntry].Name <> 'top' then
           TreeViewMain.Items.AddChild(curNode, entries.Items[iEntry].Name);
       end;
       entries.Destroy;
       entries := nil;
 
-      // while loop to form other subclasses
       parentNode := curNode;
       curNode := curNode.getFirstChild;
-      while curNode.Text <> 'top' do
+      {while curNode.Text <> 'top' do
       begin
 
         if curNode.Text <> parentNode.Text then
@@ -376,8 +375,10 @@ begin
         end
         else curNode := curNode.getNextSibling;
 
-      end;  { while end }
+      end;}
     end;
+
+    test := 'hey';
 
 end;
 

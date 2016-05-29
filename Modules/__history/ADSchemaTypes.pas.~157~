@@ -132,7 +132,11 @@ type
       constructor Create();
       destructor Destroy(); override;
   end;
-  
+
+  ADTree = class
+
+  end;
+
 implementation
 
   { --------------------------------------------------------
