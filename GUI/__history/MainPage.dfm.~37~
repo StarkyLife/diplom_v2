@@ -83,12 +83,10 @@ object MainForm: TMainForm
       Align = alClient
       ColCount = 2
       FixedColor = clWhite
-      FixedCols = 0
       RowCount = 2
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
       TabOrder = 1
-      OnDblClick = StringGridMainDblClick
       OnDrawCell = StringGridMainDrawCell
-      OnSelectCell = StringGridMainSelectCell
       ColWidths = (
         64
         64)

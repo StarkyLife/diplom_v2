@@ -586,7 +586,6 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
   
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
@@ -674,7 +673,6 @@ begin
   StringGridMain.Cells[1,0] := 'Attribute Value';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options+[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCellWithEdit;
 
   StringGridMain.RowCount := entry.AttributesCount + 1;
   iGridRowCount := 0;
@@ -752,7 +750,6 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
 
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;

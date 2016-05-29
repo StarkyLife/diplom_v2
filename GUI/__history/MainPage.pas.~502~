@@ -59,8 +59,6 @@ type
     procedure StringGridMainDblClick(Sender: TObject);
     procedure StringGridMainSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
-    procedure StringGridMainSelectCellWithEdit(Sender: TObject; ACol, ARow: Integer;
-      var CanSelect: Boolean);
   private
     { Private declarations }
     ATTRIBUTE_NODE : TTreeNode;
@@ -282,16 +280,7 @@ end;
 procedure TMainForm.StringGridMainSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
 begin
-  //TODO: it makes available Activating and Deactivatig
-end;
-
-procedure TMainForm.StringGridMainSelectCellWithEdit(Sender: TObject; ACol,
-  ARow: Integer; var CanSelect: Boolean);
-begin
-  if ACol = 0 then
-    StringGridMain.Options := StringGridMain.Options-[goEditing]
-  else
-    StringGridMain.Options := StringGridMain.Options+[goEditing];
+  //it makes available Activating and Deactivatig
 end;
 
 procedure TMainForm.TreeViewMainChange(Sender: TObject; Node: TTreeNode);
@@ -495,7 +484,7 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  //StringGridMain.OnSelectCell :=
   
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
@@ -586,7 +575,6 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
   
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
@@ -674,7 +662,6 @@ begin
   StringGridMain.Cells[1,0] := 'Attribute Value';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options+[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCellWithEdit;
 
   StringGridMain.RowCount := entry.AttributesCount + 1;
   iGridRowCount := 0;
@@ -752,7 +739,6 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
 
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;

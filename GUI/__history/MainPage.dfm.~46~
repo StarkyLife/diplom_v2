@@ -88,7 +88,6 @@ object MainForm: TMainForm
       TabOrder = 1
       OnDblClick = StringGridMainDblClick
       OnDrawCell = StringGridMainDrawCell
-      OnSelectCell = StringGridMainSelectCell
       ColWidths = (
         64
         64)

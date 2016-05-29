@@ -752,7 +752,6 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
 
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
