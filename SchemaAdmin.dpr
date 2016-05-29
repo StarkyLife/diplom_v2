@@ -13,7 +13,8 @@ uses
   HelpUnit_LDAPClient in 'Modules\HelpUnit_LDAPClient.pas',
   ADSchemaTypes in 'Modules\ADSchemaTypes.pas',
   ADSchemaHelpUnit in 'Modules\ADSchemaHelpUnit.pas',
-  AddPage in 'GUI\AddPage.pas' {Form1};
+  AddPage in 'GUI\AddPage.pas' {Form1},
+  ConnectPage in 'GUI\ConnectPage.pas' {ConnectForm};
 
 {$R *.res}
 
@@ -21,5 +22,6 @@ begin
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TConnectForm, ConnectForm);
   Application.Run;
 end.

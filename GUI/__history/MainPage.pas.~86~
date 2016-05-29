@@ -4,8 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, Grids, ToolWin, ADSchemaUnit, ADSchemaTypes,
-  Menus, ImgList;
+  Dialogs, ComCtrls, ExtCtrls, Grids, ToolWin, ADSchemaUnit, ADSchemaTypes;
 
 type
   TMainForm = class(TForm)
@@ -25,30 +24,10 @@ type
     DisconnectButton: TToolButton;
     ToolButton11: TToolButton;
     ExitButton: TToolButton;
-    MainMenu1: TMainMenu;
-    sss: TMenuItem;
-    Start1: TMenuItem;
-    Connect1: TMenuItem;
-    Disconnect1: TMenuItem;
-    Exit1: TMenuItem;
-    Help1: TMenuItem;
-    About1: TMenuItem;
-    Add1: TMenuItem;
-    Attribute1: TMenuItem;
-    Class1: TMenuItem;
-    Modify1: TMenuItem;
-    Activate1: TMenuItem;
-    Deactivate1: TMenuItem;
-    Refresh1: TMenuItem;
-    Howto1: TMenuItem;
-    AttributeSyntaxes1: TMenuItem;
-    ImageListTool: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure TreeViewMainChange(Sender: TObject; Node: TTreeNode);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure StringGridMainDrawCell(Sender: TObject; ACol, ARow: Integer;
-      Rect: TRect; State: TGridDrawState);
   private
     { Private declarations }
     ATTRIBUTE_NODE : TTreeNode;
@@ -108,21 +87,6 @@ procedure TMainForm.pvResizeGridColumns();
 begin
   StringGridMain.ColWidths[0] := trunc(StringGridMain.Width*0.29);
   StringGridMain.ColWidths[1] := trunc(StringGridMain.Width*0.7);
-end;
-
-procedure TMainForm.StringGridMainDrawCell(Sender: TObject; ACol, ARow: Integer;
-  Rect: TRect; State: TGridDrawState);
-var
-  AGrid : TStringGrid;
-begin
-  AGrid := TStringGrid(Sender);
-
-  if ARow = 0 then
-  begin
-    AGrid.Canvas.Brush.Color := clActiveBorder;
-    AGrid.Canvas.FillRect(Rect);
-    AGrid.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, AGrid.Cells[ACol, ARow]);
-  end;
 end;
 
 procedure TMainForm.TreeViewMainChange(Sender: TObject; Node: TTreeNode);

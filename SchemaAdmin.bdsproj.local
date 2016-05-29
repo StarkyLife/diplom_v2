@@ -16,5 +16,7 @@
     <Transaction>2016/05/23 00:21:31.111.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Modules\ADSchemaHelpUnit.pas</Transaction>
     <Transaction>2016/05/27 23:42:36.801.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\AddPage.pas</Transaction>
     <Transaction>2016/05/27 23:42:36.801.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit1.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\AddPage.dfm</Transaction>
+    <Transaction>2016/05/29 09:38:33.836.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ConnectPage.pas</Transaction>
+    <Transaction>2016/05/29 09:38:33.836.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ConnectPage.dfm</Transaction>
   </Transactions>
 </BorlandProject>

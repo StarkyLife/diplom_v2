@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, ExtCtrls, Grids, ToolWin, ADSchemaUnit, ADSchemaTypes,
-  Menus, ImgList;
+  Menus;
 
 type
   TMainForm = class(TForm)
@@ -42,7 +42,6 @@ type
     Refresh1: TMenuItem;
     Howto1: TMenuItem;
     AttributeSyntaxes1: TMenuItem;
-    ImageListTool: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure TreeViewMainChange(Sender: TObject; Node: TTreeNode);
@@ -117,12 +116,7 @@ var
 begin
   AGrid := TStringGrid(Sender);
 
-  if ARow = 0 then
-  begin
-    AGrid.Canvas.Brush.Color := clActiveBorder;
-    AGrid.Canvas.FillRect(Rect);
-    AGrid.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, AGrid.Cells[ACol, ARow]);
-  end;
+  
 end;
 
 procedure TMainForm.TreeViewMainChange(Sender: TObject; Node: TTreeNode);
