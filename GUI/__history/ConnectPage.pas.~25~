@@ -58,13 +58,14 @@ procedure TConnectForm.ConnectBtnClick(Sender: TObject);
 var
   hostName, userName, password : string;
   portNumber : integer;
-  entry : ADEntry;
+  //status : ADSchemaStatus;
 begin
   hostName := EditHost.Text;
   userName := EditUsername.Text;
   password := EditPassword.Text;
   portNumber := 389;
 
+  //TODO: check is user in schema admin group
   schema := ADSchema.Create(hostName, userName, password, portNumber, status);
   if (status.StatusType <> SuccessStatus) then
   begin
@@ -74,12 +75,7 @@ begin
   begin
     status.Free;
     status := nil;
-
-    //check is user in schema admin group
-    entry := schema.GetEntry('account', ClassEntry, ['cn'], status);
-    if status.StatusType <> SuccessStatus then
-      ErrorLabel.Visible := true      
-    else ModalResult := mrOk;
+    ModalResult := mrOk;
   end;
 end;
 

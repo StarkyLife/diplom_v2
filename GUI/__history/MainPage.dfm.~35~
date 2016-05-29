@@ -61,6 +61,7 @@ object MainForm: TMainForm
         Value = 50.000000000000000000
       end>
     TabOrder = 0
+    ExplicitHeight = 436
     object TreeViewMain: TTreeView
       Left = 1
       Top = 1
@@ -74,6 +75,7 @@ object MainForm: TMainForm
         0101000000470000000000000000000000FFFFFFFFFFFFFFFF00000000000000
         001741006300740069007600650020004400690072006500630074006F007200
         7900200053006300680065006D006100}
+      ExplicitHeight = 434
     end
     object StringGridMain: TStringGrid
       Left = 182
@@ -83,10 +85,10 @@ object MainForm: TMainForm
       Align = alClient
       ColCount = 2
       FixedColor = clWhite
-      RowCount = 2
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
       TabOrder = 1
       OnDrawCell = StringGridMainDrawCell
+      ExplicitHeight = 434
       ColWidths = (
         64
         64)
@@ -105,6 +107,7 @@ object MainForm: TMainForm
     object AddButton: TToolButton
       Left = 0
       Top = 0
+      Hint = 'Add New Entry'
       Caption = 'Add'
       ImageIndex = 0
       MenuItem = Add1
@@ -174,7 +177,6 @@ object MainForm: TMainForm
       Left = 558
       Top = 0
       Caption = 'Disconnect'
-      Enabled = False
       ImageIndex = 6
       MenuItem = Disconnect1
     end

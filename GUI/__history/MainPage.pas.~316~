@@ -232,13 +232,12 @@ begin
       if TreeViewCurrentNode = ATTRIBUTE_NODE then
         pvSetAttributesToTable;
 
-      if (TreeViewCurrentNode.Parent = CLASS_NODE)
-          or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
-            pvSetEntryInfoToTable(TreeViewCurrentNode.Text);
-
       if TreeViewCurrentNode = TREE_NODE then
         pvSetChildClassesToTable(TreeViewCurrentNode.Text);
 
+      if (TreeViewCurrentNode.Parent = CLASS_NODE)
+          or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
+            pvSetEntryInfoToTable(TreeViewCurrentNode.Text);
     end;
 
 end;

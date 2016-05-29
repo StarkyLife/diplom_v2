@@ -192,8 +192,7 @@ implementation
     case errorNumb of
       1 : res := 'Cant set Schema DN!';
       2 : res := 'Cant parse search results!';
-      3 : res := 'There is no all needed attributes in Entry!';
-      4 : res := 'Invalid password or user is not in schema admin group!';  
+      3 : res := 'There is no all needed attributes in Entry!';  
     end;
     Insert('ADSchema ERROR: ', res, 0);
 
@@ -325,14 +324,13 @@ implementation
   var
     i : integer;
   begin
-    if AttributesCount > 0 then
-      for i := 0 to AttributesCount - 1 do
+    if EntryAttributes.Count > 0 then
+      for i := 0 to EntryAttributes.Count - 1 do
         if Attributes[i].Name = attrName then
         begin
           result := Attributes[i];
           Exit;
-        end;   
-    result := nil;
+        end;             
   end;
 
   { Public }

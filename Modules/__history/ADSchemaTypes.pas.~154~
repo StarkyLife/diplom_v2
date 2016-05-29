@@ -192,8 +192,7 @@ implementation
     case errorNumb of
       1 : res := 'Cant set Schema DN!';
       2 : res := 'Cant parse search results!';
-      3 : res := 'There is no all needed attributes in Entry!';
-      4 : res := 'Invalid password or user is not in schema admin group!';  
+      3 : res := 'There is no all needed attributes in Entry!';  
     end;
     Insert('ADSchema ERROR: ', res, 0);
 

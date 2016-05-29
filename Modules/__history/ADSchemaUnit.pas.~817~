@@ -229,9 +229,6 @@ implementation
   begin
     //LDAPClient disconnect
     client.Disconnect;
-    _HostName := '';
-    _UserName := '';
-    _Password := '';
 
     isSchemaActive := false;
   end;
@@ -362,12 +359,6 @@ implementation
     resTemp := pvGetEntries(entryDN, filter, withAttr, status);
 
     //Check item count
-    if resTemp = nil then
-    begin
-      result := nil;       
-      Exit;
-    end;
-
     if resTemp.EntriesCount <> 1 then
     begin
       status.free;
@@ -736,8 +727,7 @@ implementation
       if pvCheckConnection = false then
       begin
         result := nil;
-        status := ADSchemaStatus.Create(4, ADSchemaError, 'Cant get schema entries!');
-        Exit;
+        status := ADSchemaStatus.Create(3, ADSchemaError, '');
       end;      
     end;
 

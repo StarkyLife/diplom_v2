@@ -230,8 +230,6 @@ implementation
     //LDAPClient disconnect
     client.Disconnect;
     _HostName := '';
-    _UserName := '';
-    _Password := '';
 
     isSchemaActive := false;
   end;

@@ -14,14 +14,16 @@ uses
   ADSchemaTypes in 'Modules\ADSchemaTypes.pas',
   ADSchemaHelpUnit in 'Modules\ADSchemaHelpUnit.pas',
   AddPage in 'GUI\AddPage.pas' {Form1},
-  ConnectPage in 'GUI\ConnectPage.pas' {ConnectForm};
+  ConnectPage in 'GUI\ConnectPage.pas' {ConnectForm},
+  ErrorPage in 'GUI\ErrorPage.pas' {ErrorForm};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
-  Application.CreateForm(TForm1, Form1);
+  {Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TConnectForm, ConnectForm);
+  Application.CreateForm(TErrorForm, ErrorForm);}
   Application.Run;
 end.

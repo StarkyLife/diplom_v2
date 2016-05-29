@@ -91,7 +91,6 @@ object ConnectForm: TConnectForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      Text = 'starkyli-1sqlu0.domain.local'
     end
   end
   object GroupBox2: TGroupBox
@@ -146,7 +145,6 @@ object ConnectForm: TConnectForm
       ParentFont = False
       PasswordChar = '*'
       TabOrder = 1
-      Text = 'pa$$w0rd'
     end
     object EditUsername: TEdit
       Left = 112
@@ -160,7 +158,6 @@ object ConnectForm: TConnectForm
       Font.Style = []
       ParentFont = False
       TabOrder = 0
-      Text = 'starkylife@domain.local'
     end
   end
 end

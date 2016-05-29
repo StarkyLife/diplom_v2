@@ -150,7 +150,7 @@ begin
 
   pvChangeDisconnectButtonsState(false);
 
-  pvClearStringGridTable();
+  //pvConnect;
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
@@ -223,24 +223,13 @@ begin
   { Controling wich node is selected in tree }
   TreeViewCurrentNode := Node;
 
-  if schema <> nil then
-    if schema.isActive then
-    begin
-      //Change the table content
-      if TreeViewCurrentNode = CLASS_NODE then
-        pvSetClassesToTable;
-      if TreeViewCurrentNode = ATTRIBUTE_NODE then
-        pvSetAttributesToTable;
-
-      if (TreeViewCurrentNode.Parent = CLASS_NODE)
-          or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
-            pvSetEntryInfoToTable(TreeViewCurrentNode.Text);
-
-      if TreeViewCurrentNode = TREE_NODE then
-        pvSetChildClassesToTable(TreeViewCurrentNode.Text);
-
-    end;
-
+  //Change the table content
+  if TreeViewCurrentNode = CLASS_NODE then
+    pvSetClassesToTable;
+  if TreeViewCurrentNode = ATTRIBUTE_NODE then
+    pvSetAttributesToTable;
+  if TreeViewCurrentNode = TREE_NODE then
+    pvSetChildClassesToTable(TreeViewCurrentNode.Text);
 end;
 
 { PRIVATE Load TreeView Items function }
@@ -514,9 +503,6 @@ begin
 
       if attribute.ValuesCount > 0 then
       begin
-        if attribute.ValuesCount > 1 then
-          StringGridMain.RowCount := StringGridMain.RowCount + (attribute.ValuesCount-1);
-
         for iValue := 0 to attribute.ValuesCount - 1 do
         begin
           iGridRowCount := iGridRowCount + 1;

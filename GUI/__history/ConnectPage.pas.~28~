@@ -75,10 +75,10 @@ begin
     status.Free;
     status := nil;
 
-    //check is user in schema admin group
+    //TODO: check is user in schema admin group
     entry := schema.GetEntry('account', ClassEntry, ['cn'], status);
     if status.StatusType <> SuccessStatus then
-      ErrorLabel.Visible := true      
+      ErrorLabel := true
     else ModalResult := mrOk;
   end;
 end;

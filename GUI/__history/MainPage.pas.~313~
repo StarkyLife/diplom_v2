@@ -150,7 +150,7 @@ begin
 
   pvChangeDisconnectButtonsState(false);
 
-  pvClearStringGridTable();
+  //pvConnect;
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
@@ -223,23 +223,17 @@ begin
   { Controling wich node is selected in tree }
   TreeViewCurrentNode := Node;
 
-  if schema <> nil then
-    if schema.isActive then
-    begin
-      //Change the table content
-      if TreeViewCurrentNode = CLASS_NODE then
-        pvSetClassesToTable;
-      if TreeViewCurrentNode = ATTRIBUTE_NODE then
-        pvSetAttributesToTable;
+  //Change the table content
+  if TreeViewCurrentNode = CLASS_NODE then
+    pvSetClassesToTable;
+  if TreeViewCurrentNode = ATTRIBUTE_NODE then
+    pvSetAttributesToTable;
 
-      if (TreeViewCurrentNode.Parent = CLASS_NODE)
-          or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
-            pvSetEntryInfoToTable(TreeViewCurrentNode.Text);
+  if TreeViewCurrentNode = TREE_NODE then
+    pvSetChildClassesToTable(TreeViewCurrentNode.Text);
 
-      if TreeViewCurrentNode = TREE_NODE then
-        pvSetChildClassesToTable(TreeViewCurrentNode.Text);
-
-    end;
+  if (TreeViewCurrentNode.Parent = CLASS_NODE)
+      or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
 
 end;
 

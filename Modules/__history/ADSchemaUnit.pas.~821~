@@ -229,9 +229,6 @@ implementation
   begin
     //LDAPClient disconnect
     client.Disconnect;
-    _HostName := '';
-    _UserName := '';
-    _Password := '';
 
     isSchemaActive := false;
   end;
@@ -364,7 +361,8 @@ implementation
     //Check item count
     if resTemp = nil then
     begin
-      result := nil;       
+      result := nil;
+      
       Exit;
     end;
 
