@@ -25,7 +25,7 @@ type
     status : ADSchemaStatus;
   public
     { Public declarations }
-    property GetSchema : ADSchema
+    property GetSchema : ADSchemaStatus
       read schema;
   end;
 

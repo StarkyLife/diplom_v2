@@ -18,15 +18,12 @@ type
     ErrorLabel: TLabel;
     procedure ConnectBtnClick(Sender: TObject);
     procedure ErrorLabelClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     schema : ADSchema;
     status : ADSchemaStatus;
   public
     { Public declarations }
-    property GetSchema : ADSchema
-      read schema;
   end;
 
 var
@@ -49,30 +46,12 @@ begin
 
   schema := ADSchema.Create(hostName, userName, password, portNumber, status);
   if status.StatusType <> SuccessStatus then
-  begin
-    ErrorLabel.Visible := true
-  end
-  else
-  begin
-    status.Free;
-    status := nil;
-    ModalResult := mrOk;
-  end;
+    ErrorLabel.Visible := true;
 end;
 
 procedure TConnectForm.ErrorLabelClick(Sender: TObject);
 begin
   //TODO: error dialog
-
-end;
-
-procedure TConnectForm.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  if status <> nil then
-  begin
-    status.free;
-    status := nil;
-  end;
 end;
 
 end.

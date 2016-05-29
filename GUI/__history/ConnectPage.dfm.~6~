@@ -14,7 +14,6 @@ object ConnectForm: TConnectForm
   Font.Style = []
   OldCreateOrder = False
   Position = poDesktopCenter
-  OnClose = FormClose
   PixelsPerInch = 96
   TextHeight = 13
   object LabelHost: TLabel
@@ -117,12 +116,12 @@ object ConnectForm: TConnectForm
     Width = 97
     Height = 41
     Caption = 'Connect'
-    Default = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -19
     Font.Name = 'Tahoma'
     Font.Style = []
+    ModalResult = 1
     ParentFont = False
     TabOrder = 3
     OnClick = ConnectBtnClick

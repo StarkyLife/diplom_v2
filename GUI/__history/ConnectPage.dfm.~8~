@@ -117,7 +117,6 @@ object ConnectForm: TConnectForm
     Width = 97
     Height = 41
     Caption = 'Connect'
-    Default = True
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -19

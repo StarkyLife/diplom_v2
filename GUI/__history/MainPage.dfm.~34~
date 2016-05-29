@@ -207,7 +207,6 @@ object MainForm: TMainForm
       end
       object Disconnect1: TMenuItem
         Caption = 'Disconnect'
-        Enabled = False
         ImageIndex = 6
         OnClick = Disconnect1Click
       end

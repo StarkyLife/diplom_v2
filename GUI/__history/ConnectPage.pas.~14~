@@ -18,14 +18,13 @@ type
     ErrorLabel: TLabel;
     procedure ConnectBtnClick(Sender: TObject);
     procedure ErrorLabelClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     schema : ADSchema;
     status : ADSchemaStatus;
   public
     { Public declarations }
-    property GetSchema : ADSchema
+    property GetSchema : ADSchemaStatus
       read schema;
   end;
 
@@ -64,15 +63,6 @@ procedure TConnectForm.ErrorLabelClick(Sender: TObject);
 begin
   //TODO: error dialog
 
-end;
-
-procedure TConnectForm.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  if status <> nil then
-  begin
-    status.free;
-    status := nil;
-  end;
 end;
 
 end.

@@ -73,7 +73,7 @@ implementation
 
 {$R *.dfm}
 
-//Getting info from form
+//TODO: Getting info from form
 procedure TMainForm.pvConnect;
 var
   conForm : TConnectForm;
@@ -116,7 +116,7 @@ begin
   CLASS_NODE.DeleteChildren;
   TREE_NODE.DeleteChildren;
 
-  //pvConnect;
+  pvConnect;
 end;
 
 procedure TMainForm.Exit1Click(Sender: TObject);
@@ -190,28 +190,11 @@ var
   iEntry : integer;
   
 begin
-  //Get Attributes     !!!TODO: sizelimit in search operation exceeded
-  entries := schema.GetAll(AttributeEntry, ['cn'], status);
-  if status.StatusType <> SuccessStatus then
-  begin
-    //TODO: here error handling
-    Exit;
-  end;
-  status.Free;
-  status := nil;
-  
-  for iEntry := 0 to entries.EntriesCount - 1 do
-  begin
-    TreeViewMain.Items.AddChild(ATTRIBUTE_NODE, entries.Items[iEntry].Name);
-  end;
-  entries.Destroy;
-  entries := nil;
-
   //Get Classes
   entries := schema.GetAll(ClassEntry, ['cn'], status);
   if status.StatusType <> SuccessStatus then
   begin
-    //TODO: here error handling
+    //here error handling
     Exit;
   end;
   status.Free;
@@ -223,7 +206,22 @@ begin
   entries.Destroy;
   entries := nil;
 
-  //TODO: Form Class Tree
+  //Get Attributes     !!!TODO: sizelimit in search operation exceeded
+  entries := schema.GetAll(AttributeEntry, ['cn'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    //here error handling
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+  
+  for iEntry := 0 to entries.EntriesCount - 1 do
+  begin
+    TreeViewMain.Items.AddChild(ATTRIBUTE_NODE, entries.Items[iEntry].Name);
+  end;
+  entries.Destroy;
+  entries := nil;
 
 end;
 

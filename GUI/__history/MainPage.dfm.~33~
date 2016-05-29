@@ -17,6 +17,7 @@ object MainForm: TMainForm
   OnClose = FormClose
   OnCreate = FormCreate
   OnResize = FormResize
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object GridPanel1: TGridPanel
@@ -207,7 +208,6 @@ object MainForm: TMainForm
       end
       object Disconnect1: TMenuItem
         Caption = 'Disconnect'
-        Enabled = False
         ImageIndex = 6
         OnClick = Disconnect1Click
       end

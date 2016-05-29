@@ -1,6 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'SchemaAdmin'
   ClientHeight = 505
   ClientWidth = 746
@@ -107,12 +108,9 @@ object MainForm: TMainForm
     object AddButton: TToolButton
       Left = 0
       Top = 0
-      Hint = 'Add New Entry'
       Caption = 'Add'
       ImageIndex = 0
       MenuItem = Add1
-      ParentShowHint = False
-      ShowHint = True
     end
     object ModifyButton: TToolButton
       Left = 89
@@ -207,7 +205,6 @@ object MainForm: TMainForm
       end
       object Disconnect1: TMenuItem
         Caption = 'Disconnect'
-        Enabled = False
         ImageIndex = 6
         OnClick = Disconnect1Click
       end

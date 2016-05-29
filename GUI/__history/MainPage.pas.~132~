@@ -73,7 +73,7 @@ implementation
 
 {$R *.dfm}
 
-//Getting info from form
+//TODO: Getting info from form
 procedure TMainForm.pvConnect;
 var
   conForm : TConnectForm;

@@ -1,8 +1,9 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'SchemaAdmin'
-  ClientHeight = 505
+  ClientHeight = 485
   ClientWidth = 746
   Color = clBtnFace
   Constraints.MinWidth = 754
@@ -23,7 +24,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 50
     Width = 746
-    Height = 456
+    Height = 436
     Align = alCustom
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColumnCollection = <
@@ -61,12 +62,11 @@ object MainForm: TMainForm
         Value = 50.000000000000000000
       end>
     TabOrder = 0
-    ExplicitHeight = 436
     object TreeViewMain: TTreeView
       Left = 1
       Top = 1
       Width = 181
-      Height = 454
+      Height = 434
       Align = alClient
       Indent = 19
       TabOrder = 0
@@ -75,20 +75,18 @@ object MainForm: TMainForm
         0101000000470000000000000000000000FFFFFFFFFFFFFFFF00000000000000
         001741006300740069007600650020004400690072006500630074006F007200
         7900200053006300680065006D006100}
-      ExplicitHeight = 434
     end
     object StringGridMain: TStringGrid
       Left = 182
       Top = 1
       Width = 563
-      Height = 454
+      Height = 434
       Align = alClient
       ColCount = 2
       FixedColor = clWhite
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing]
       TabOrder = 1
       OnDrawCell = StringGridMainDrawCell
-      ExplicitHeight = 434
       ColWidths = (
         64
         64)
@@ -107,19 +105,14 @@ object MainForm: TMainForm
     object AddButton: TToolButton
       Left = 0
       Top = 0
-      Hint = 'Add New Entry'
       Caption = 'Add'
       ImageIndex = 0
-      MenuItem = Add1
-      ParentShowHint = False
-      ShowHint = True
     end
     object ModifyButton: TToolButton
       Left = 89
       Top = 0
-      Caption = 'Modify'
+      Caption = 'ModifyButton'
       ImageIndex = 1
-      MenuItem = Modify1
     end
     object ToolButton3: TToolButton
       Left = 178
@@ -132,16 +125,14 @@ object MainForm: TMainForm
     object ActivateButton: TToolButton
       Left = 186
       Top = 0
-      Caption = 'Activate'
+      Caption = 'ActivateButton'
       ImageIndex = 2
-      MenuItem = Activate1
     end
     object DeactivateButton: TToolButton
       Left = 275
       Top = 0
-      Caption = 'Deactivate'
+      Caption = 'DeactivateButton'
       ImageIndex = 3
-      MenuItem = Deactivate1
     end
     object ToolButton6: TToolButton
       Left = 364
@@ -154,9 +145,8 @@ object MainForm: TMainForm
     object RefreshButton: TToolButton
       Left = 372
       Top = 0
-      Caption = 'Refresh'
+      Caption = 'RefreshButton'
       ImageIndex = 4
-      MenuItem = Refresh1
     end
     object ToolButton8: TToolButton
       Left = 461
@@ -169,16 +159,14 @@ object MainForm: TMainForm
     object ConnectButton: TToolButton
       Left = 469
       Top = 0
-      Caption = 'Connect'
+      Caption = 'ConnectButton'
       ImageIndex = 5
-      MenuItem = Connect1
     end
     object DisconnectButton: TToolButton
       Left = 558
       Top = 0
-      Caption = 'Disconnect'
+      Caption = 'DisconnectButton'
       ImageIndex = 6
-      MenuItem = Disconnect1
     end
     object ToolButton11: TToolButton
       Left = 647
@@ -191,9 +179,8 @@ object MainForm: TMainForm
     object ExitButton: TToolButton
       Left = 655
       Top = 0
-      Caption = 'Exit'
+      Caption = 'ExitButton'
       ImageIndex = 7
-      MenuItem = Exit1
     end
   end
   object MainMenu1: TMainMenu
@@ -202,42 +189,36 @@ object MainForm: TMainForm
       Caption = 'Start'
       object Connect1: TMenuItem
         Caption = 'Connect'
-        ImageIndex = 5
-        OnClick = Connect1Click
       end
       object Disconnect1: TMenuItem
         Caption = 'Disconnect'
-        Enabled = False
-        ImageIndex = 6
-        OnClick = Disconnect1Click
       end
       object Exit1: TMenuItem
         Caption = 'Exit'
-        ImageIndex = 7
-        OnClick = Exit1Click
       end
     end
     object sss: TMenuItem
       Caption = 'Edit'
       object Add1: TMenuItem
         Caption = 'Add'
-        ImageIndex = 0
+        object Attribute1: TMenuItem
+          Caption = 'Attribute'
+        end
+        object Class1: TMenuItem
+          Caption = 'Class'
+        end
       end
       object Modify1: TMenuItem
         Caption = 'Modify'
-        ImageIndex = 1
       end
       object Activate1: TMenuItem
         Caption = 'Activate'
-        ImageIndex = 2
       end
       object Deactivate1: TMenuItem
         Caption = 'Deactivate'
-        ImageIndex = 3
       end
       object Refresh1: TMenuItem
         Caption = 'Refresh'
-        ImageIndex = 4
       end
     end
     object Help1: TMenuItem
