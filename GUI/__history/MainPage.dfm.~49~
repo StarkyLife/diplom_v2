@@ -235,12 +235,10 @@ object MainForm: TMainForm
       object Deactivate1: TMenuItem
         Caption = 'Deactivate'
         ImageIndex = 3
-        OnClick = Deactivate1Click
       end
       object Refresh1: TMenuItem
         Caption = 'Refresh'
         ImageIndex = 4
-        OnClick = Refresh1Click
       end
     end
     object Help1: TMenuItem

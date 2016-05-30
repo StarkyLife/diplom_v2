@@ -157,16 +157,14 @@ begin
 end;
 
 procedure TMainForm.Refresh1Click(Sender: TObject);
-var
-  newThread : TLoadThread;
 begin
   ATTRIBUTE_NODE.DeleteChildren;
   CLASS_NODE.DeleteChildren;
   TREE_NODE.DeleteChildren;
 
-  pvClearStringGridTable();
+  
 
-  newThread := TLoadThread.Create(false);
+  pvClearStringGridTable();
 
 end;
 

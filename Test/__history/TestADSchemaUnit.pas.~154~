@@ -210,7 +210,7 @@ begin
   newEntryClass.AddAttribute('cn', ['MyTestGUITest']);
   newEntryClass.AddAttribute('objectClass', ['classSchema']);
   newEntryClass.AddAttribute('governsID', ['1.2.840.113556.1.8000.2554.13844.27782.13802.18569.40486.16667616.15992155']);
-  newEntryClass.AddAttribute('mayContain', ['MyTest3', 'MyTestAttribute']);
+  newEntryClass.AddAttribute('mayContain', ['MyTest3']);
   
   newEntryClass.AddAttribute('subClassOf', ['MyTest']);
 

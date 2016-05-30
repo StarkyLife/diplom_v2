@@ -62,8 +62,6 @@ type
     procedure StringGridMainSelectCellWithEdit(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
     procedure Activate1Click(Sender: TObject);
-    procedure Deactivate1Click(Sender: TObject);
-    procedure Refresh1Click(Sender: TObject);
   private
     { Private declarations }
     ATTRIBUTE_NODE : TTreeNode;
@@ -156,20 +154,6 @@ begin
   end;
 end;
 
-procedure TMainForm.Refresh1Click(Sender: TObject);
-var
-  newThread : TLoadThread;
-begin
-  ATTRIBUTE_NODE.DeleteChildren;
-  CLASS_NODE.DeleteChildren;
-  TREE_NODE.DeleteChildren;
-
-  pvClearStringGridTable();
-
-  newThread := TLoadThread.Create(false);
-
-end;
-
 //Getting info from form
 procedure TMainForm.pvConnect;
 var
@@ -223,7 +207,8 @@ begin
               if status.StatusType <> SuccessStatus then
                 pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
               status.Free;
-              status := nil;             
+              status := nil;
+            
           end else
             if TreeViewCurrentNode.Selected then
             begin
@@ -245,48 +230,6 @@ end;
 procedure TMainForm.Connect1Click(Sender: TObject);
 begin
   pvConnect;
-end;
-
-procedure TMainForm.Deactivate1Click(Sender: TObject);
-var status : ADSchemaStatus;
-  modEntry : ADEntry;
-begin
-  if StringGridMain.ColCount <> 2 then
-  begin
-    if (TreeViewCurrentNode <> CLASS_NODE) and
-      (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
-      (TreeViewCurrentNode <> TREE_NODE) then
-    begin
-      with StringGridMain do
-        begin
-          if (rowCount > 1) and (row > 0) then
-          begin
-              modEntry := ADEntry.Create(Cells[0, Row]);
-              modEntry.AddAttribute('isDefunct', ['TRUE']);
-              status := schema.ModifyEntryAttributes(modEntry);
-              modEntry.Destroy;
-              modEntry := nil;
-              if status.StatusType <> SuccessStatus then
-                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
-              status.Free;
-              status := nil;             
-          end else
-            if TreeViewCurrentNode.Selected then
-            begin
-              modEntry := ADEntry.Create(TreeViewCurrentNode.Text);
-              modEntry.AddAttribute('isDefunct', ['TRUE']);
-              status := schema.ModifyEntryAttributes(modEntry);
-              modEntry.Destroy;
-              modEntry := nil;
-              if status.StatusType <> SuccessStatus then
-                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
-              status.Free;
-              status := nil;
-            end;
-        end;  
-    end;
-  end;
-
 end;
 
 procedure TMainForm.Disconnect1Click(Sender: TObject);

@@ -63,7 +63,6 @@ type
       var CanSelect: Boolean);
     procedure Activate1Click(Sender: TObject);
     procedure Deactivate1Click(Sender: TObject);
-    procedure Refresh1Click(Sender: TObject);
   private
     { Private declarations }
     ATTRIBUTE_NODE : TTreeNode;
@@ -154,20 +153,6 @@ begin
   finally
     errorForm.Free;
   end;
-end;
-
-procedure TMainForm.Refresh1Click(Sender: TObject);
-var
-  newThread : TLoadThread;
-begin
-  ATTRIBUTE_NODE.DeleteChildren;
-  CLASS_NODE.DeleteChildren;
-  TREE_NODE.DeleteChildren;
-
-  pvClearStringGridTable();
-
-  newThread := TLoadThread.Create(false);
-
 end;
 
 //Getting info from form
