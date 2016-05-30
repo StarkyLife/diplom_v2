@@ -65,7 +65,6 @@ type
     procedure Deactivate1Click(Sender: TObject);
     procedure Refresh1Click(Sender: TObject);
     procedure Add1Click(Sender: TObject);
-    procedure Modify1Click(Sender: TObject);
   private
     { Private declarations }
     ATTRIBUTE_NODE : TTreeNode;
@@ -120,22 +119,6 @@ end;
 procedure TMainForm.LoadInOtherThread;
 begin
   pvLoadItemsToTree;  
-end;
-
-procedure TMainForm.Modify1Click(Sender: TObject);
-var
-  addForm : TAddForm;
-begin
-  addForm := TAddForm.Create(Application);
-  addForm.schema := schema;
-  addForm.isModify := true;
-  //TODO: set entry Name
-  try
-    if addForm.ShowModal = mrOk then
-      Refresh1.Click;
-  finally
-    addForm.Free;
-  end;
 end;
 
 { TStringGrid }
@@ -264,12 +247,9 @@ procedure TMainForm.Add1Click(Sender: TObject);
 var
   addForm : TAddForm;
 begin
-  addForm := TAddForm.Create(Application);
-  addForm.schema := schema;
-  addForm.isModify := false;
+  addForm := TAddForm.Create(Application);        
   try
-    if addForm.ShowModal = mrOk then
-      Refresh1.Click;
+    addForm.ShowModal;
   finally
     addForm.Free;
   end;

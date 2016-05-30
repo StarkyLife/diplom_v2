@@ -129,7 +129,7 @@ begin
   addForm := TAddForm.Create(Application);
   addForm.schema := schema;
   addForm.isModify := true;
-  //TODO: set entry Name
+  //set entry Name
   try
     if addForm.ShowModal = mrOk then
       Refresh1.Click;

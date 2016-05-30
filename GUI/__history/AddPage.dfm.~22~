@@ -4,7 +4,7 @@ object AddForm: TAddForm
   BorderStyle = bsDialog
   Caption = 'New Entry'
   ClientHeight = 433
-  ClientWidth = 679
+  ClientWidth = 663
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,17 +20,13 @@ object AddForm: TAddForm
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 679
+    Width = 663
     Height = 433
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 655
-      ExplicitHeight = 0
       object LabelName: TLabel
         Left = 24
         Top = 24
@@ -143,13 +139,9 @@ object AddForm: TAddForm
       object FlowPanel1: TFlowPanel
         Left = 336
         Top = 18
-        Width = 321
+        Width = 297
         Height = 353
         Caption = 'Optional'
-        Padding.Left = 2
-        Padding.Top = 2
-        Padding.Right = 2
-        Padding.Bottom = 2
         TabOrder = 3
       end
       object AddOptionButton: TButton
@@ -167,9 +159,7 @@ object AddForm: TAddForm
         Width = 89
         Height = 41
         Caption = 'Save'
-        Default = True
         TabOrder = 5
-        OnClick = SaveBtnClick
         Glyph.Data = {
           DE010000424DDE01000000000000760000002800000024000000120000000100
           0400000000006801000000000000000000001000000000000000000000000000
@@ -193,6 +183,10 @@ object AddForm: TAddForm
     object TabSheet2: TTabSheet
       Caption = 'May/Must Attributes'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
 end

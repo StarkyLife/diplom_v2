@@ -34,7 +34,6 @@ type
     FlowPanel1: TFlowPanel;
     AddOptionButton: TButton;
     SaveBtn: TBitBtn;
-    TabSheet2: TTabSheet;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -301,7 +300,7 @@ procedure TAddForm.pvSetAvailableAttributes(isAttribute : boolean);
 begin
   //TODO: Load item list
   
-  //Set to available attributes except mayContain, mustContain
+  //Set to available attributes
 end;
 
 { OptionClass }

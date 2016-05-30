@@ -25,12 +25,10 @@ object AddForm: TAddForm
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 663
     object TabSheet1: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
       ExplicitWidth = 655
-      ExplicitHeight = 0
       object LabelName: TLabel
         Left = 24
         Top = 24
@@ -146,10 +144,6 @@ object AddForm: TAddForm
         Width = 321
         Height = 353
         Caption = 'Optional'
-        Padding.Left = 2
-        Padding.Top = 2
-        Padding.Right = 2
-        Padding.Bottom = 2
         TabOrder = 3
       end
       object AddOptionButton: TButton
@@ -169,7 +163,6 @@ object AddForm: TAddForm
         Caption = 'Save'
         Default = True
         TabOrder = 5
-        OnClick = SaveBtnClick
         Glyph.Data = {
           DE010000424DDE01000000000000760000002800000024000000120000000100
           0400000000006801000000000000000000001000000000000000000000000000
@@ -193,6 +186,7 @@ object AddForm: TAddForm
     object TabSheet2: TTabSheet
       Caption = 'May/Must Attributes'
       ImageIndex = 1
+      ExplicitWidth = 655
     end
   end
 end

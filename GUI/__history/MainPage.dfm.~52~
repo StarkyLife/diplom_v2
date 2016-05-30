@@ -222,12 +222,10 @@ object MainForm: TMainForm
       object Add1: TMenuItem
         Caption = 'Add'
         ImageIndex = 0
-        OnClick = Add1Click
       end
       object Modify1: TMenuItem
         Caption = 'Modify'
         ImageIndex = 1
-        OnClick = Modify1Click
       end
       object Activate1: TMenuItem
         Caption = 'Activate'

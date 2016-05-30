@@ -34,7 +34,6 @@ type
     FlowPanel1: TFlowPanel;
     AddOptionButton: TButton;
     SaveBtn: TBitBtn;
-    TabSheet2: TTabSheet;
     procedure ComboBoxTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -112,8 +111,7 @@ begin
 
     for i := 0 to optionalAttributes.Count - 1 do
     begin
-      //TODO: add optional attributes
-      //if there are attributes with equal name then add them to value
+    
     end;
     
     status := schema.AddEntry(newEntry);
@@ -126,8 +124,6 @@ begin
       Exit;
     end;
     status.Free;
-    if newEntry <> nil then
-      newEntry.Destroy;
   end
   else
   //MODIFYING
@@ -301,7 +297,7 @@ procedure TAddForm.pvSetAvailableAttributes(isAttribute : boolean);
 begin
   //TODO: Load item list
   
-  //Set to available attributes except mayContain, mustContain
+  //Set to available attributes
 end;
 
 { OptionClass }

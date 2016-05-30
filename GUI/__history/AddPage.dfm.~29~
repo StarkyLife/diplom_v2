@@ -190,9 +190,5 @@ object AddForm: TAddForm
         NumGlyphs = 2
       end
     end
-    object TabSheet2: TTabSheet
-      Caption = 'May/Must Attributes'
-      ImageIndex = 1
-    end
   end
 end
