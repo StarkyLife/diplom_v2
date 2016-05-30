@@ -251,7 +251,8 @@ procedure TMainForm.Deactivate1Click(Sender: TObject);
 var status : ADSchemaStatus;
   modEntry : ADEntry;
 begin
-  
+  if StringGridMain.ColCount <> 2 then
+  begin
     if (TreeViewCurrentNode <> CLASS_NODE) and
       (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
       (TreeViewCurrentNode <> TREE_NODE) then
@@ -284,7 +285,7 @@ begin
             end;
         end;  
     end;
-
+  end;
 
 end;
 

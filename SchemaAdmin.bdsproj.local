@@ -20,5 +20,9 @@
     <Transaction>2016/05/29 09:38:33.836.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ConnectPage.dfm</Transaction>
     <Transaction>2016/05/29 16:05:07.435.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ErrorPage.pas</Transaction>
     <Transaction>2016/05/29 16:05:07.435.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ErrorPage.dfm</Transaction>
+    <Transaction>2016/05/30 03:47:23.152.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.pas</Transaction>
+    <Transaction>2016/05/30 03:47:23.168.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.dfm</Transaction>
+    <Transaction>2016/05/30 03:52:16.428.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.pas=</Transaction>
+    <Transaction>2016/05/30 03:52:16.428.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.dfm=</Transaction>
   </Transactions>
 </BorlandProject>
