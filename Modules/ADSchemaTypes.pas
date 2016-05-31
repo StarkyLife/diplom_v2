@@ -62,6 +62,7 @@ type
         read GetValuesCount;          
         
       function GetList() : TStringList;
+      function SearchValue(value : string) : integer;
       procedure AddValue(value : string);
       procedure DeleteValue(valueIndex : integer);
 
@@ -239,6 +240,25 @@ implementation
   function ADAttribute.GetList() : TStringList;
   begin
     result := AttributeValues;
+  end;
+
+  { Public }
+  function ADAttribute.SearchValue(value : string) : integer;
+  var
+    i : integer;
+  begin
+    result := -1;
+    if AttributeValues.Count > 0 then
+    begin
+      for i := 0 to AttributeValues.Count - 1 do
+      begin
+        if AttributeValues[i] = value then
+        begin
+          result := i;
+          Break;
+        end;
+      end;
+    end;    
   end;
 
   { Public }

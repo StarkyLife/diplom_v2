@@ -410,7 +410,7 @@ implementation
       AttributeEntry: filter := '(objectClass=attributeSchema)';
     end;
 
-    result := pvGetEntries(entryDN, filter, withAttr, status);
+    {result := pvGetEntries(entryDN, filter, withAttr, status);
     if status.StatusNumb = 4 then
     begin
       if result <> nil then
@@ -419,10 +419,10 @@ implementation
         result := nil;
       end;
       status.Free;
-      status := nil;
+      status := nil;}
 
       result := pvSearchExtended(entryDN, entrType, withAttr, status);
-    end;
+    //end;
   end;
 
   { Public }

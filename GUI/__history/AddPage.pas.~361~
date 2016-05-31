@@ -1,0 +1,676 @@
+unit AddPage;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls, StdCtrls, Buttons, ExtCtrls, ADSchemaUnit, ADSchemaTypes,
+  ErrorPage, SelectPage;
+
+type
+  OptionClass = class
+    comboBox : TComboBox;
+    edit : TEdit;
+    deleteBtn : TSpeedButton;
+    onLoadEditText : string;
+    public
+      constructor Create(cbx: TComboBox; ed: TEdit; dbtn: TSpeedButton; onLoadText : string);
+  end;
+
+  TAddForm = class(TForm)
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    LabelName: TLabel;
+    LabelType: TLabel;
+    EditName: TEdit;
+    ComboBoxType: TComboBox;
+    GroupBox1: TGroupBox;
+    OIDLabel: TLabel;
+    SyntaxLabel: TLabel;
+    oMSyntaxLabel: TLabel;
+    OIDEdit: TEdit;
+    SyntaxEdit: TEdit;
+    oMSyntaxEdit: TEdit;
+    FlowPanel1: TFlowPanel;
+    AddOptionButton: TButton;
+    SaveBtn: TBitBtn;
+    TabSheet2: TTabSheet;
+    ScrollBox1: TScrollBox;
+    GroupBoxMust: TGroupBox;
+    GroupBoxMay: TGroupBox;
+    ListBoxMust: TListBox;
+    ListBoxMay: TListBox;
+    BtnAddMust: TButton;
+    BtnDeleteMust: TButton;
+    BtnAddMay: TButton;
+    BtnDeleteMay: TButton;
+    procedure ComboBoxTypeChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure AddOptionButtonClick(Sender: TObject);
+    procedure DeleteInAddMode(Sender: TObject);
+    procedure DeleteInModifyMode(Sender: TObject);
+    procedure DeleteClick(Sender: TObject);
+    procedure SaveBtnClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure EditOptionalChange(Sender: TObject);
+    procedure BtnAddMayClick(Sender: TObject);
+    procedure BtnAddMustClick(Sender: TObject);
+    procedure BtnDeleteMustClick(Sender: TObject);
+    procedure BtnDeleteMayClick(Sender: TObject);
+
+  private
+    { Private declarations }
+    optionalAttributes : TList;
+    availableAttributeList : TStringList;
+    isMayMustChanged : boolean;
+    
+
+    procedure pvLoadData();
+    procedure pvSetDataByType(isAttribute : boolean);
+    procedure pvSetAvailableAttributes(isAttribute : boolean);
+    function pvGetIndexOfComboAttribute(attrName : string) : integer;
+
+    procedure pvShowErrorDialog(errorNumb: integer; errorMsg: string);
+  public
+    { Public declarations }
+    schema : ADSchema;
+    
+    isModify : boolean;
+    entryName : string;
+  end;
+
+var
+  AddForm: TAddForm;
+
+implementation
+
+{$R *.dfm}
+
+//Error handling
+procedure TAddForm.pvShowErrorDialog(errorNumb: integer; errorMsg: string);
+var
+  errorForm : TErrorForm;
+begin
+  errorForm := TErrorForm.Create(Application);
+  errorForm.SetErrorInfo(errorNumb, errorMsg);
+  try
+    errorForm.ShowModal;
+  finally
+    errorForm.Free;
+  end;
+end;
+
+procedure TAddForm.SaveBtnClick(Sender: TObject);
+var
+  status : ADSchemaStatus;
+  newEntry : ADEntry;
+  entryName : string;
+  i : integer;
+  temp : OptionClass;
+  tempiAttribute : integer;
+begin
+  if schema = nil then
+    Exit;
+
+  entryName := EditName.Text;
+  newEntry := ADEntry.Create(entryName);
+
+  if not isModify then
+  // ADDING
+  begin
+    newEntry.AddAttribute('cn', [entryName]);
+    if ComboBoxType.ItemIndex = 0 then
+    begin 
+      newEntry.AddAttribute('objectClass', ['attributeSchema']);
+      newEntry.AddAttribute('attributeID', [OIDEdit.Text]);  
+      newEntry.AddAttribute('attributeSyntax', [SyntaxEdit.Text]);
+      newEntry.AddAttribute('oMSyntax', [oMSyntaxEdit.Text]);    
+    end
+    else
+    begin
+      newEntry.AddAttribute('objectClass', ['classSchema']);
+      newEntry.AddAttribute('governsID', [OIDEdit.Text]);
+    end;
+
+    for i := 0 to optionalAttributes.Count - 1 do
+    begin
+      temp := OptionClass(optionalAttributes[i]);
+      //add optional attributes
+      newEntry.AddAttribute(temp.comboBox.Text, [temp.edit.Text]);
+      //TODO: if there are attributes with equal name then add them to value
+    end;
+
+    if isMayMustChanged then
+    begin
+      if ListBoxMay.Items.Count > 0 then
+      begin
+        tempiAttribute := newEntry.AddAttribute('mayContain');
+        for i := 0 to ListBoxMay.Items.Count - 1 do
+          newEntry.Attributes[tempiAttribute].AddValue(ListBoxMay.Items[i]);
+      end;
+
+      if ListBoxMust.Items.Count > 0 then
+      begin
+        tempiAttribute := newEntry.AddAttribute('mustContain');
+        for i := 0 to ListBoxMust.Items.Count - 1 do
+          newEntry.Attributes[tempiAttribute].AddValue(ListBoxMust.Items[i]);
+      end;
+    end;
+
+    status := schema.AddEntry(newEntry);
+  end
+  else
+  //MODIFYING don't touch not changed attributes
+  begin
+    for i := 0 to optionalAttributes.Count - 1 do
+    begin
+      temp := OptionClass(optionalAttributes[i]);
+      //add optional attributes
+      if temp.edit.Font.Color = clRed then
+        if temp.edit.Text <> temp.onLoadEditText then
+          newEntry.AddAttribute(temp.comboBox.Text, [temp.edit.Text]);
+      //TODO: if there are attributes with equal name then add them to value
+    end;
+
+    if isMayMustChanged then
+    begin
+      if ListBoxMay.Items.Count > 0 then
+      begin
+        tempiAttribute := newEntry.AddAttribute('mayContain');
+        for i := 0 to ListBoxMay.Items.Count - 1 do
+          newEntry.Attributes[tempiAttribute].AddValue(ListBoxMay.Items[i]);
+      end;
+
+      if ListBoxMust.Items.Count > 0 then
+      begin
+        tempiAttribute := newEntry.AddAttribute('mustContain');
+        for i := 0 to ListBoxMust.Items.Count - 1 do
+          newEntry.Attributes[tempiAttribute].AddValue(ListBoxMust.Items[i]);
+      end;
+    end;
+
+    status := schema.ModifyEntryAttributes(newEntry);
+  end;     
+
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    if newEntry <> nil then
+      newEntry.Destroy;
+    Exit;
+  end;
+  status.Free;
+  if newEntry <> nil then
+    newEntry.Destroy;
+
+  ModalResult := mrOk;
+end;
+
+procedure TAddForm.EditOptionalChange(Sender: TObject);
+begin
+  (Sender as TEdit).Font.Color := clRed;
+end;
+
+procedure TAddForm.AddOptionButtonClick(Sender: TObject);
+var
+  combobx : TComboBox;
+  editbx : TEdit;
+  deletebx : TSpeedButton;
+  i : integer;
+begin
+  combobx := TComboBox.Create(self);
+  combobx.Parent := FlowPanel1;
+  if availableAttributeList <> nil then
+  begin
+    if availableAttributeList.Count > 0 then
+    begin
+      for i := 0 to availableAttributeList.Count - 1 do
+        combobx.Items.Add(availableAttributeList[i]);
+      combobx.ItemIndex := 0;
+    end;
+  end;   
+
+  editbx := TEdit.Create(self);
+  editbx.Parent := FlowPanel1;
+  editbx.OnChange := EditOptionalChange;
+
+  deletebx := TSpeedButton.Create(self);
+  //set image
+  //deletebx.Glyph.LoadFromFile(GetCurrentDir + '/Icons/delete2322.bmp');
+  deletebx.Glyph.LoadFromFile(GetCurrentDir + '/Icons/delete2322.bmp');
+  //set click event handler
+  deletebx.OnClick := DeleteClick;
+  deletebx.Parent := FlowPanel1;
+
+  optionalAttributes.Add(OptionClass.Create(combobx, editbx, deletebx, 'hehe! Try to fit this :D'));
+end;
+
+procedure TAddForm.BtnAddMayClick(Sender: TObject);
+var
+  selectForm : TSelectForm;
+begin
+  selectForm := TSelectForm.Create(Application);
+  selectForm.schema := schema;
+  try
+    if selectForm.ShowModal = mrOk then
+    begin
+      ListBoxMay.Items.Add(selectForm.selectedValue);
+      isMayMustChanged := true;
+    end;
+  finally
+    selectForm.Free;
+  end;
+end;
+
+procedure TAddForm.BtnAddMustClick(Sender: TObject);
+var
+  selectForm : TSelectForm;
+begin
+  selectForm := TSelectForm.Create(Application);
+  selectForm.schema := schema;
+  try
+    if selectForm.ShowModal = mrOk then
+    begin
+      ListBoxMust.Items.Add(selectForm.selectedValue);
+      isMayMustChanged := true;
+    end;
+  finally
+    selectForm.Free;
+  end;
+
+end;
+
+procedure TAddForm.BtnDeleteMayClick(Sender: TObject);
+begin
+  if ListBoxMay.ItemIndex <> -1 then
+  begin
+    ListBoxMay.Items.Delete(ListBoxMay.ItemIndex);
+    isMayMustChanged := true;
+  end;
+end;
+
+procedure TAddForm.BtnDeleteMustClick(Sender: TObject);
+begin
+  if ListBoxMust.ItemIndex <> -1 then
+  begin
+    ListBoxMust.Items.Delete(ListBoxMust.ItemIndex);
+    isMayMustChanged := true;
+  end;
+end;
+
+procedure TAddForm.ComboBoxTypeChange(Sender: TObject);
+begin
+  if ComboBoxType.ItemIndex = 1 then
+  begin
+    pvSetDataByType(false);
+    pvSetAvailableAttributes(false);
+  end
+  else
+  begin
+    pvSetDataByType(true);
+    pvSetAvailableAttributes(true);
+  end;
+
+end;
+
+procedure TAddForm.DeleteClick(Sender: TObject);
+begin
+  if schema = nil then
+    Exit;
+  if isModify then
+    DeleteInModifyMode(Sender)
+  else
+    DeleteInAddMode(Sender);
+end;
+
+procedure TAddForm.DeleteInAddMode(Sender: TObject);
+var
+  i : integer;
+  temp : OptionClass;
+begin
+  //remove from form  
+  for i := 0 to optionalAttributes.Count - 1 do
+  begin
+    if OptionClass(optionalAttributes[i]).deleteBtn = Sender then
+    begin
+      temp := OptionClass(optionalAttributes[i]);
+      temp.comboBox.Free;
+      temp.edit.free;
+      temp.deleteBtn.Free;
+      temp.Free;
+      optionalAttributes.Delete(i);       
+      Break;
+    end;    
+  end;
+end;
+
+procedure TAddForm.DeleteInModifyMode(Sender: TObject);
+var
+  i : integer;
+  temp : OptionClass;
+  attrName, attrValue, entryName : string;
+  status : ADSchemaStatus;
+begin
+  //remove from form  
+  for i := 0 to optionalAttributes.Count - 1 do
+  begin
+    if OptionClass(optionalAttributes[i]).deleteBtn = Sender then
+    begin
+      temp := OptionClass(optionalAttributes[i]);
+      attrName := temp.comboBox.Text;
+      attrValue := temp.edit.Text;
+      entryName := EditName.Text;
+
+      //call api
+      status := schema.DeleteEntryAttributes(entryName, [attrName]);
+      if status.StatusNumb <> 16 then
+        if status.StatusType <> SuccessStatus then
+        begin
+          pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+          status.free;
+          Break;
+        end;
+      status.free;
+      
+      temp.comboBox.Free;      
+      temp.edit.free;
+      temp.deleteBtn.Free;
+      temp.Free;
+      optionalAttributes.Delete(i);       
+      Break;
+    end;    
+  end;    
+  
+end;
+
+procedure TAddForm.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  i : integer;
+begin
+  if optionalAttributes.Count > 0 then
+    for i := 0 to optionalAttributes.Count - 1 do
+      OptionClass(optionalAttributes[i]).Free;
+  optionalAttributes.Free;
+  availableAttributeList.Free;
+end;
+
+procedure TAddForm.FormCreate(Sender: TObject);
+begin
+  availableAttributeList := TStringList.Create;
+  optionalAttributes := TList.Create;
+
+  
+end;
+
+procedure TAddForm.FormShow(Sender: TObject);
+begin
+  isMayMustChanged := false;
+  pvSetDataByType(true);
+  pvSetAvailableAttributes(true);  
+  if isModify then
+  begin
+    Caption := 'Modify';
+    pvLoadData;
+    EditName.Enabled := false;
+    ComboBoxType.Enabled := false;
+    OIDEdit.Enabled := false;
+    SyntaxEdit.Enabled := false;
+    oMSyntaxEdit.Enabled := false;
+    BtnAddMust.Visible := false;
+    BtnDeleteMust.Visible := false;
+  end;
+
+end;
+
+procedure TAddForm.pvLoadData();
+var
+  entries : ADEntryList;
+  entry : ADEntry;
+  status : ADSchemaStatus;
+  temp : ADAttribute;  
+  iTemp : integer;
+  iAttribute : integer;
+
+  lAttributesBox : TComboBox;
+  lAttrValueEdit : TEdit;
+  lAttrDelete : TSpeedButton;
+  i : integer;
+begin
+  if schema = nil then
+    Exit;
+  //Load modify Data entry
+  entries := schema.GetEntries('(cn=' + entryName + ')', [], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+        pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+        status.free;
+        if entries <> nil then
+          entries.Destroy;
+        Exit;
+  end;
+  status.free;
+  if entries = nil then
+  begin
+    pvShowErrorDialog(999, 'Cant load the entry data');
+    Exit;
+  end;
+
+  if entries.EntriesCount > 0 then
+    entry := entries.Items[0]
+  else
+  begin
+    pvShowErrorDialog(999, 'Cant load the entry data');
+    entries.Destroy;
+    Exit;
+  end;
+
+  EditName.Text := entry.Name;
+
+  temp := entry.GetAttributeByName('objectClass');
+  if temp <> nil then
+  begin
+    if temp.ValuesCount > 0 then
+    begin
+      iTemp := temp.SearchValue('attributeSchema');
+      if iTemp <> -1 then
+      begin
+        ComboBoxType.ItemIndex := 0;
+        pvSetDataByType(true);
+        pvSetAvailableAttributes(true);
+
+        temp := entry.GetAttributeByName('attributeID');
+        if temp <> nil then
+        begin
+          if temp.ValuesCount > 0 then
+            OIDEdit.Text := temp.Values[0];
+          entry.DeleteAttribute('attributeID');
+        end;
+
+        temp := entry.GetAttributeByName('attributeSyntax');
+        if temp <> nil then
+        begin
+          if temp.ValuesCount > 0 then
+            SyntaxEdit.Text := temp.Values[0];
+          entry.DeleteAttribute('attributeSyntax');
+        end;
+
+        temp := entry.GetAttributeByName('oMSyntax');
+        if temp <> nil then
+        begin
+          if temp.ValuesCount > 0 then
+            oMSyntaxEdit.Text := temp.Values[0];
+          entry.DeleteAttribute('oMSyntax');
+        end;
+      end
+      else
+      begin
+        ComboBoxType.ItemIndex := 1;
+        pvSetDataByType(false);
+        pvSetAvailableAttributes(false);
+
+        temp := entry.GetAttributeByName('governsID');
+        if temp <> nil then
+        begin
+          if temp.ValuesCount > 0 then
+            OIDEdit.Text := temp.Values[0];
+          entry.DeleteAttribute('governsID');
+        end;
+      end;
+    end;
+    entry.DeleteAttribute('objectClass');
+  end;
+
+  //other attributes
+  for iAttribute := 0 to entry.AttributesCount - 1 do
+  begin
+    temp := entry.Attributes[iAttribute];
+    if ((temp.Name = 'mustContain') or (temp.Name = 'systemMustContain')) then
+    begin
+      if temp.ValuesCount > 0 then
+        for i := 0 to temp.ValuesCount - 1 do
+          ListBoxMust.Items.Add(temp.Values[i]);
+    end;
+    if ((temp.Name = 'mayContain') or (temp.Name = 'systemMayContain')) then
+    begin
+      if temp.ValuesCount > 0 then
+        for i := 0 to temp.ValuesCount - 1 do
+          ListBoxMay.Items.Add(temp.Values[i]);
+    end;  
+
+    lAttributesBox := TComboBox.Create(self);
+    lAttributesBox.Parent := FlowPanel1;
+    if availableAttributeList <> nil then
+    begin
+      if availableAttributeList.Count > 0 then
+      begin
+        for i := 0 to availableAttributeList.Count - 1 do
+          lAttributesBox.Items.Add(availableAttributeList[i]);
+        iTemp := pvGetIndexOfComboAttribute(temp.Name);
+        if iTemp <> -1 then
+          lAttributesBox.ItemIndex := 0
+        else lAttributesBox.Text := temp.Name;
+      end;
+    end;
+
+    lAttrValueEdit := TEdit.Create(self);
+    lAttrValueEdit.Parent := FlowPanel1;
+    //TODO: if attribute is multiValued
+    if temp.ValuesCount > 0 then
+      lAttrValueEdit.Text := temp.Values[0];
+    lAttrValueEdit.OnChange := EditOptionalChange;
+
+    lAttrDelete := TSpeedButton.Create(self);
+    //set image
+    lAttrDelete.Glyph.LoadFromFile(GetCurrentDir + '/Icons/delete2322.bmp');
+    //set click event handler
+    lAttrDelete.OnClick := DeleteClick;
+    lAttrDelete.Parent := FlowPanel1;
+
+    optionalAttributes.Add(OptionClass.Create(lAttributesBox, lAttrValueEdit, lAttrDelete, lAttrValueEdit.Text));
+
+  end;
+
+end;
+
+function TAddForm.pvGetIndexOfComboAttribute(attrName : string) : integer;
+var
+  i : integer;
+begin
+  result := -1;
+  if availableAttributeList.Count > 0 then
+    for i := 0 to availableAttributeList.Count - 1 do
+      if availableAttributeList[i] = attrName then
+        result := i;
+end;
+
+procedure TAddForm.pvSetDataByType(isAttribute : boolean);
+begin
+  if isAttribute then
+  begin
+    OIDLabel.Caption := 'attributeID';
+    SyntaxLabel.Visible := true;
+    SyntaxEdit.Visible := true;
+    oMSyntaxLabel.Visible := true;
+    oMSyntaxEdit.Visible := true;
+    TabSheet2.Enabled := false;
+  end
+  else
+  begin
+    OIDLabel.Caption := 'governsID';
+    SyntaxLabel.Visible := false;
+    SyntaxEdit.Visible := false;
+    oMSyntaxLabel.Visible := false;
+    oMSyntaxEdit.Visible := false;
+    TabSheet2.Enabled := true;
+  end;
+end;
+
+procedure TAddForm.pvSetAvailableAttributes(isAttribute : boolean);
+var
+  entries : ADEntryList;
+  status : ADSchemaStatus;
+  iEntry, iAttribute, iValue : integer;
+  temp : string;
+begin
+  availableAttributeList.Clear;
+
+  if schema = nil then
+    Exit;
+
+  //Load item list
+  if isAttribute then
+  begin
+    entries := schema.GetEntries('(|(cn=top)(cn=attributeSchema))',
+                                ['mustContain', 'mayContain', 'systemMustContain', 'systemMayContain'],
+                                status);
+  end else
+  begin
+    entries := schema.GetEntries('(|(cn=top)(cn=classSchema))',
+                                ['mustContain', 'mayContain', 'systemMustContain', 'systemMayContain'],
+                                status);
+  end;
+  if status.StatusType <> SuccessStatus then
+    begin
+      pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+      status.free;
+      entries.destroy;
+      Exit;
+    end;
+  status.free;
+   if entries = nil then
+      Exit;
+  //Set to available attributes except mayContain, mustContain
+  for iEntry := 0 to entries.EntriesCount - 1 do
+  begin
+    for iAttribute := 0 to entries.Items[iEntry].AttributesCount - 1 do
+    begin
+      for iValue := 0 to entries.Items[iEntry].Attributes[iAttribute].ValuesCount - 1 do
+      begin
+        temp := entries.Items[iEntry].Attributes[iAttribute].Values[iValue];
+        if ((temp <> 'mustContain')
+          and (temp <> 'mayContain')
+            and (temp <> 'systemMustContain')
+              and (temp <> 'systemMayContain')) then
+                availableAttributeList.Add(temp);         
+      end;
+        
+    end;
+      
+  end;
+
+  
+end;
+
+{ OptionClass }
+
+constructor OptionClass.Create(cbx: TComboBox; ed: TEdit; dbtn: TSpeedButton; onLoadText : string);
+begin
+  comboBox := cbx;
+  edit := ed;
+  deleteBtn := dbtn;
+  onLoadEditText := onLoadText;
+end;
+
+end.

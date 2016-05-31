@@ -24,5 +24,7 @@
     <Transaction>2016/05/30 03:47:23.168.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit2.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.dfm</Transaction>
     <Transaction>2016/05/30 03:52:16.428.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.pas=</Transaction>
     <Transaction>2016/05/30 03:52:16.428.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\ChoosePage.dfm=</Transaction>
+    <Transaction>2016/05/31 21:01:57.005.pas,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit1.pas=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\SelectPage.pas</Transaction>
+    <Transaction>2016/05/31 21:01:57.005.dfm,C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\Unit1.dfm=C:\Documents and Settings\Administrator.DOMAIN\My Documents\Borland Studio Projects\Diplom_v2\GUI\SelectPage.dfm</Transaction>
   </Transactions>
 </BorlandProject>

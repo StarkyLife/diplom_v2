@@ -1,0 +1,1026 @@
+unit MainPage;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls, ExtCtrls, Grids, ToolWin, ADSchemaUnit, ADSchemaTypes,
+  Menus, ImgList, ConnectPage, Errorpage, AddPage;
+
+type
+  TStringGrid = class(Grids.TStringGrid)
+  public
+    function SelectCell(ACol: Integer; ARow: Integer): Boolean; override;
+    procedure KeyPress(var Key: Char); override;
+  end;
+
+  TMainForm = class(TForm)
+    GridPanel1: TGridPanel;
+    TreeViewMain: TTreeView;
+    StringGridMain: TStringGrid;
+    ToolBar1: TToolBar;
+    AddButton: TToolButton;
+    ModifyButton: TToolButton;
+    ToolButton3: TToolButton;
+    ActivateButton: TToolButton;
+    DeactivateButton: TToolButton;
+    ToolButton6: TToolButton;
+    RefreshButton: TToolButton;
+    ToolButton8: TToolButton;
+    ConnectButton: TToolButton;
+    DisconnectButton: TToolButton;
+    ToolButton11: TToolButton;
+    ExitButton: TToolButton;
+    MainMenu1: TMainMenu;
+    sss: TMenuItem;
+    Start1: TMenuItem;
+    Connect1: TMenuItem;
+    Disconnect1: TMenuItem;
+    Exit1: TMenuItem;
+    Help1: TMenuItem;
+    About1: TMenuItem;
+    Add1: TMenuItem;
+    Modify1: TMenuItem;
+    Activate1: TMenuItem;
+    Deactivate1: TMenuItem;
+    Refresh1: TMenuItem;
+    Howto1: TMenuItem;
+    AttributeSyntaxes1: TMenuItem;
+    ImageListTool: TImageList;
+    procedure FormCreate(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure TreeViewMainChange(Sender: TObject; Node: TTreeNode);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure StringGridMainDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure Exit1Click(Sender: TObject);
+    procedure Disconnect1Click(Sender: TObject);
+    procedure Connect1Click(Sender: TObject);
+    procedure StringGridMainDblClick(Sender: TObject);
+    procedure StringGridMainSelectCellWithEdit(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
+    procedure Activate1Click(Sender: TObject);
+    procedure Deactivate1Click(Sender: TObject);
+    procedure Refresh1Click(Sender: TObject);
+    procedure Add1Click(Sender: TObject);
+    procedure Modify1Click(Sender: TObject);
+  private
+    { Private declarations }
+    ATTRIBUTE_NODE : TTreeNode;
+    CLASS_NODE : TTreeNode;
+    TREE_NODE : TTreeNode;
+
+    TreeViewCurrentNode : TTreeNode;
+    schema : ADSchema;
+
+    procedure pvResizeGridColumns();
+
+    procedure pvConnect();
+    procedure pvLoadItemsToTree();
+    
+    procedure pvSetClassesToTable();
+    procedure pvSetAttributesToTable();
+    procedure pvSetEntryInfoToTable(entryName: string);
+    procedure pvSetChildClassesToTable(parentClassName : string);
+
+    procedure pvChangeDisconnectButtonsState(state : boolean);
+    procedure pvClearStringGridTable();
+
+
+
+    //Error procedure
+    procedure pvShowErrorDialog(errorNumb: integer; errorMsg: string);
+  public
+    { Public declarations }
+    procedure LoadInOtherThread;
+    procedure SaveTable();
+  end;
+
+  TLoadThread = class(TThread)
+    protected
+      procedure Execute; override;
+  end;
+
+var
+  MainForm: TMainForm;
+
+implementation
+
+{$R *.dfm}
+
+{ Working with thread
+ LOADING elements of TreeView component }
+procedure TLoadThread.Execute;
+begin
+  MainForm.LoadInOtherThread;
+end;
+
+procedure TMainForm.LoadInOtherThread;
+begin
+  pvLoadItemsToTree;  
+end;
+
+procedure TMainForm.Modify1Click(Sender: TObject);
+var
+  addForm : TAddForm;
+begin
+  addForm := TAddForm.Create(Application);
+  addForm.schema := schema;
+  addForm.isModify := true;
+  //TODO: set entry Name
+
+
+
+      with StringGridMain do
+        begin
+          if (rowCount > 1) and (row > 0) then
+          begin
+              addForm.entryName := Cells[0, Row];
+              
+          end else
+            if (TreeViewCurrentNode <> CLASS_NODE) and
+                (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
+                  (TreeViewCurrentNode <> TREE_NODE) then
+                    if TreeViewCurrentNode.Selected then
+                    begin
+                      addForm.entryName := TreeViewCurrentNode.Text;
+                    end;
+        end;  
+
+
+  try
+    if addForm.ShowModal = mrOk then
+      Refresh1.Click;
+  finally
+    addForm.Free;
+  end;
+end;
+
+{ TStringGrid }
+
+function TStringGrid.SelectCell(ACol, ARow: Integer): Boolean;
+begin
+  if (EditorMode=True) then MainForm.SaveTable;
+  result:=inherited SelectCell(ACol, ARow);
+end;
+
+procedure TStringGrid.KeyPress(var Key: Char);
+begin
+  if key=#13 then MainForm.SaveTable;
+  inherited;
+end;
+
+{ TMainForm }
+
+procedure TMainForm.pvChangeDisconnectButtonsState(state : boolean);
+begin
+  Disconnect1.Enabled := state;
+  DisconnectButton.Enabled := state; 
+end;
+
+//Error handling
+procedure TMainForm.pvShowErrorDialog(errorNumb: integer; errorMsg: string);
+var
+  errorForm : TErrorForm;
+begin
+  errorForm := TErrorForm.Create(Application);
+  errorForm.SetErrorInfo(errorNumb, errorMsg);
+  try
+    errorForm.ShowModal;
+  finally
+    errorForm.Free;
+  end;
+end;
+
+procedure TMainForm.Refresh1Click(Sender: TObject);
+var
+  newThread : TLoadThread;
+begin
+  ATTRIBUTE_NODE.DeleteChildren;
+  CLASS_NODE.DeleteChildren;
+  TREE_NODE.DeleteChildren;
+
+  pvClearStringGridTable();
+
+  newThread := TLoadThread.Create(false);
+
+end;
+
+//Getting info from form
+procedure TMainForm.pvConnect;
+var
+  conForm : TConnectForm;
+  modalRes : integer;
+  newThread : TLoadThread;
+begin
+  conForm := TConnectForm.Create(Application);
+  try
+    modalRes := conform.ShowModal;
+    if modalRes = mrOk then
+    begin
+      schema := conform.GetSchema;
+      conForm.Close;
+
+      //load Tree View
+      //pvLoadItemsToTree;
+      newThread := TLoadThread.Create(false);
+
+      pvChangeDisconnectButtonsState(true);
+
+    end else
+    if modalRes = mrCancel then
+    begin
+      conForm.Close;
+    end;
+  finally    
+    conform.Free;
+  end;
+end;
+
+procedure TMainForm.Activate1Click(Sender: TObject);
+var status : ADSchemaStatus;
+  modEntry : ADEntry;
+begin
+
+    if (TreeViewCurrentNode <> CLASS_NODE) and
+      (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
+      (TreeViewCurrentNode <> TREE_NODE) then
+    begin
+      with StringGridMain do
+        begin
+          if (rowCount > 1) and (row > 0) then
+          begin
+              modEntry := ADEntry.Create(Cells[0, Row]);
+              modEntry.AddAttribute('isDefunct', ['FALSE']);
+              status := schema.ModifyEntryAttributes(modEntry);
+              modEntry.Destroy;
+              modEntry := nil;
+              if status.StatusType <> SuccessStatus then
+                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+              status.Free;
+              status := nil;             
+          end else
+            if TreeViewCurrentNode.Selected then
+            begin
+              modEntry := ADEntry.Create(TreeViewCurrentNode.Text);
+              modEntry.AddAttribute('isDefunct', ['FALSE']);
+              status := schema.ModifyEntryAttributes(modEntry);
+              modEntry.Destroy;
+              modEntry := nil;
+              if status.StatusType <> SuccessStatus then
+                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+              status.Free;
+              status := nil;
+            end;
+        end;  
+    end;
+  
+end;
+
+procedure TMainForm.Add1Click(Sender: TObject);
+var
+  addForm : TAddForm;
+begin
+  addForm := TAddForm.Create(Application);
+  addForm.schema := schema;
+  addForm.isModify := false;
+  try
+    if addForm.ShowModal = mrOk then
+      Refresh1.Click;
+  finally
+    addForm.Free;
+  end;
+
+end;
+
+procedure TMainForm.Connect1Click(Sender: TObject);
+begin
+  pvConnect;
+end;
+
+procedure TMainForm.Deactivate1Click(Sender: TObject);
+var status : ADSchemaStatus;
+  modEntry : ADEntry;
+begin
+  
+    if (TreeViewCurrentNode <> CLASS_NODE) and
+      (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
+      (TreeViewCurrentNode <> TREE_NODE) then
+    begin
+      with StringGridMain do
+        begin
+          if (rowCount > 1) and (row > 0) then
+          begin
+              modEntry := ADEntry.Create(Cells[0, Row]);
+              modEntry.AddAttribute('isDefunct', ['TRUE']);
+              status := schema.ModifyEntryAttributes(modEntry);
+              modEntry.Destroy;
+              modEntry := nil;
+              if status.StatusType <> SuccessStatus then
+                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+              status.Free;
+              status := nil;             
+          end else
+            if TreeViewCurrentNode.Selected then
+            begin
+              modEntry := ADEntry.Create(TreeViewCurrentNode.Text);
+              modEntry.AddAttribute('isDefunct', ['TRUE']);
+              status := schema.ModifyEntryAttributes(modEntry);
+              modEntry.Destroy;
+              modEntry := nil;
+              if status.StatusType <> SuccessStatus then
+                pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+              status.Free;
+              status := nil;
+            end;
+        end;  
+    end;
+
+
+end;
+
+procedure TMainForm.Disconnect1Click(Sender: TObject);
+begin
+  if schema <> nil then
+    schema.Disconnect;
+
+  ATTRIBUTE_NODE.DeleteChildren;
+  CLASS_NODE.DeleteChildren;
+  TREE_NODE.DeleteChildren;
+
+  pvChangeDisconnectButtonsState(false);
+
+  pvClearStringGridTable();
+end;
+
+procedure TMainForm.Exit1Click(Sender: TObject);
+begin
+  MainForm.Close;
+end;
+
+procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if schema <> nil then
+    schema.Destroy;
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+var
+  //status : ADSchemaStatus;
+  firstNode : TTreeNode;
+begin
+  Application.HintColor := clGrayText;
+  Application.HintPause := 250;
+
+  pvResizeGridColumns;
+  
+  firstNode := TreeViewMain.Items.GetFirstNode;
+  ATTRIBUTE_NODE := TreeViewMain.Items.AddChild(firstNode, 'Attributes');
+  CLASS_NODE := TreeViewMain.Items.AddChild(firstNode, 'Classes');
+  TREE_NODE := TreeViewMain.Items.AddChild(firstNode, 'ClassTree');
+
+  StringGridMain.Cells[0, 0] := 'Name';
+  StringGridMain.Cells[1, 0] := 'Value';
+end;
+
+procedure TMainForm.FormResize(Sender: TObject);
+begin
+  pvResizeGridColumns;
+end;
+
+{ PRIVATE Resize function for stringGrid columns }
+procedure TMainForm.pvResizeGridColumns();
+begin
+  StringGridMain.ColWidths[0] := trunc(StringGridMain.Width*0.29);
+  if StringGridMain.ColCount = 2 then
+  begin
+    StringGridMain.ColWidths[1] := trunc(StringGridMain.Width*0.67);
+  end;
+  if StringGridMain.ColCount = 3 then
+  begin
+    StringGridMain.ColWidths[1] := trunc(StringGridMain.Width*0.37);
+    StringGridMain.ColWidths[2] := trunc(StringGridMain.Width*0.3);
+  end;
+end;
+
+procedure TMainForm.StringGridMainDblClick(Sender: TObject);   
+begin  
+  with StringGridMain do
+  begin
+    //Cells[0,0] := IntToStr(Col) + ' ' + IntToStr(Row);
+    if Col = 0 then
+      if Row > 0 then
+      begin
+        if ColCount <> 2 then         
+          pvSetEntryInfoToTable(StringGridMain.Cells[col, row]);
+      end;
+  end;
+end;
+
+procedure TMainForm.StringGridMainDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  AGrid : TStringGrid;
+begin
+  AGrid := TStringGrid(Sender);
+
+  if ARow = 0 then
+  begin
+    AGrid.Canvas.Brush.Color := clBtnFace;
+    AGrid.Canvas.FillRect(Rect);
+    AGrid.Canvas.TextOut(Rect.Left + 2, Rect.Top + 2, AGrid.Cells[ACol, ARow]);
+  end;
+end;
+
+procedure TMainForm.StringGridMainSelectCellWithEdit(Sender: TObject; ACol,
+  ARow: Integer; var CanSelect: Boolean);
+begin
+  if ACol = 0 then
+    StringGridMain.Options := StringGridMain.Options-[goEditing]
+  else
+    StringGridMain.Options := StringGridMain.Options+[goEditing];
+end;
+
+procedure TMainForm.TreeViewMainChange(Sender: TObject; Node: TTreeNode);
+begin
+  { Controling wich node is selected in tree }
+  TreeViewCurrentNode := Node;
+  StringGridMain.Selection := TGridRect(Rect(-1,-1,-1,-1));
+
+  if schema <> nil then
+    if schema.isActive then
+    begin
+      //Change the table content
+      if TreeViewCurrentNode = CLASS_NODE then
+        pvSetClassesToTable
+      else
+        if TreeViewCurrentNode = ATTRIBUTE_NODE then
+          pvSetAttributesToTable
+        else 
+          if (TreeViewCurrentNode.Parent = CLASS_NODE)
+            or (TreeViewCurrentNode.Parent = ATTRIBUTE_NODE) then
+              pvSetEntryInfoToTable(TreeViewCurrentNode.Text)
+          else
+            if TreeViewCurrentNode <> TreeViewMain.Items.GetFirstNode then
+              pvSetChildClassesToTable(TreeViewCurrentNode.Text);       
+
+    end;
+
+end;
+
+{ PRIVATE Load TreeView Items function }
+procedure TMainForm.pvLoadItemsToTree();
+
+var
+  entries : ADEntryList;
+  status : ADSchemaStatus;
+  iEntry : integer;
+  topEntry : ADEntry;
+  curNode, parentNode : TTreeNode;
+  test : string;
+begin
+  //Get Attributes     
+  entries := schema.GetAll(AttributeEntry, ['cn'], status);     
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries <> nil then
+    if entries.EntriesCount > 0 then
+    begin
+      for iEntry := 0 to entries.EntriesCount - 1 do
+      begin
+        TreeViewMain.Items.AddChild(ATTRIBUTE_NODE, entries.Items[iEntry].Name);
+      end;
+      entries.Destroy;
+      entries := nil;
+    end;    
+
+  //Get Classes
+  entries := schema.GetAll(ClassEntry, ['cn'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries <> nil then
+    if entries.EntriesCount > 0 then
+    begin
+      for iEntry := 0 to entries.EntriesCount - 1 do
+      begin
+        TreeViewMain.Items.AddChild(CLASS_NODE, entries.Items[iEntry].Name);
+      end;
+      entries.Destroy;
+      entries := nil;
+    end;
+  //----------------------------------------------------------
+  //---------------- Form Class Tree -----------------------
+  // -----------------------------------------------------
+  curNode := TreeViewMain.Items.AddChild(TREE_NODE, 'top');
+
+  //top class childs
+  entries := schema.GetEntries('(&(objectClass=classSchema)(subClassOf=top))', ['cn'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+  if entries <> nil then
+    if entries.EntriesCount > 0 then
+    begin
+      for iEntry := 0 to entries.EntriesCount - 1 do
+      begin
+        if entries.Items[iEntry].Name <> 'Top' then
+          TreeViewMain.Items.AddChild(curNode, entries.Items[iEntry].Name);
+      end;
+      entries.Destroy;
+      entries := nil;
+
+      // while loop to form other subclasses
+      parentNode := curNode;
+      curNode := curNode.getFirstChild;
+      while curNode.Text <> 'top' do
+      begin
+
+        if curNode.Text <> parentNode.Text then
+        begin
+          entries := schema.GetEntries('(&(objectClass=classSchema)(subClassOf=' + curNode.Text + '))', ['cn'], status);
+          status.free;
+          status := nil;
+          if (entries <> nil) then
+            if entries.EntriesCount > 0 then
+            begin
+              for iEntry := 0 to entries.EntriesCount - 1 do
+              begin
+                TreeViewMain.Items.AddChild(curNode, entries.Items[iEntry].Name);
+              end;
+              entries.Destroy;
+              entries := nil;
+
+              parentNode := curNode;
+              curNode := curNode.getFirstChild;
+              Continue;
+          end;
+        end
+        else parentNode := curNode.Parent;
+
+        if curNode.Text = parentNode.GetLastChild.Text then
+        begin
+          curNode := parentNode;
+          continue;
+        end
+        else curNode := curNode.getNextSibling;
+
+      end;  { while end }
+    end;
+
+end;
+
+procedure TMainForm.pvSetClassesToTable();
+var
+  entries : ADEntryList;
+  status : ADSchemaStatus;
+  iEntry, iGridRowCount : integer;
+  curAttrValue : string;
+  curAttr : ADAttribute;
+begin
+  //GET Classes
+
+  entries := schema.GetAll(ClassEntry, ['isDefunct', 'objectClassCategory'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries = nil then
+    Exit;
+
+  //Fill The Table
+  pvClearStringGridTable;
+  StringGridMain.ColCount := 3;
+  StringGridMain.Cells[0,0] := 'Class Name';
+  StringGridMain.Cells[1,0] := 'Type';
+  StringGridMain.Cells[2,0] := 'Status';
+  pvResizeGridColumns;
+  StringGridMain.Options := StringGridMain.Options-[goEditing];
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  
+  StringGridMain.RowCount := entries.EntriesCount + 1;
+  iGridRowCount := 0;
+  if entries.EntriesCount <> 0 then
+  begin
+    for iEntry := 0 to entries.EntriesCount - 1 do
+    begin
+      iGridRowCount := iGridRowCount + 1;
+      StringGridMain.Cells[0, iGridRowCount] := entries.Items[iEntry].Name;
+
+      if (entries.Items[iEntry].AttributesCount > 0) then
+      begin
+        curAttr := entries.Items[iEntry].GetAttributeByName('objectClassCategory');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            curAttrValue := curAttr.Values[0];
+            if curAttrValue = '0' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Type88'
+            else if curAttrValue = '1' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Structural'
+            else if curAttrValue = '2' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Abstract'
+            else if curAttrValue = '3' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Auxiliary';
+          end; {curAttr.ValuesCount > 0}
+        end; {curAttr <> nil}
+        
+        curAttr := entries.Items[iEntry].GetAttributeByName('isDefunct');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            if curAttr.Values[0] = 'FALSE' then
+              StringGridMain.Cells[2, iGridRowCount] := 'Active'
+            else
+              StringGridMain.Cells[2, iGridRowCount] := 'Deactivated';
+          end;
+        end {curAttr <> nil}
+        else StringGridMain.Cells[2, iGridRowCount] := 'Active';
+      end;  {(entries.Items[iEntry].AttributesCount > 0)}
+    end; {for iEntry := 0 to entries.EntriesCount - 1 do}
+  end;  {entries.EntriesCount <> 0}
+  if entries <> nil then
+  begin
+    entries.Destroy;
+    entries := nil;
+  end;
+        
+end;
+
+procedure TMainForm.pvSetAttributesToTable();
+var
+  entries : ADEntryList;
+  status : ADSchemaStatus;
+  iEntry, iGridRowCount, i : integer;
+  //curAttrValue : string;
+  curAttr : ADAttribute;
+begin
+  //GET Attributes
+
+  entries := schema.GetAll(AttributeEntry, ['isDefunct', 'attributeSyntax'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries = nil then
+    Exit;
+  
+  //Fill The Table
+  pvClearStringGridTable;
+
+  StringGridMain.ColCount := 3;
+  StringGridMain.Cells[0,0] := 'Attribute Name';
+  StringGridMain.Cells[1,0] := 'Syntax';
+  StringGridMain.Cells[2,0] := 'Status';
+  pvResizeGridColumns;
+  StringGridMain.Options := StringGridMain.Options-[goEditing];
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  
+  StringGridMain.RowCount := entries.EntriesCount + 1;
+  iGridRowCount := 0;
+  if entries.EntriesCount <> 0 then
+  begin
+    for iEntry := 0 to entries.EntriesCount - 1 do
+    begin
+      iGridRowCount := iGridRowCount + 1;
+      StringGridMain.Cells[0, iGridRowCount] := entries.Items[iEntry].Name;
+
+      if (entries.Items[iEntry].AttributesCount > 0) then
+      begin
+        curAttr := entries.Items[iEntry].GetAttributeByName('attributeSyntax');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            StringGridMain.Cells[1, iGridRowCount] := curAttr.Values[0];
+          end; {curAttr.ValuesCount > 0}
+        end; {curAttr <> nil}
+        
+        curAttr := entries.Items[iEntry].GetAttributeByName('isDefunct');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            if curAttr.Values[0] = 'FALSE' then
+              StringGridMain.Cells[2, iGridRowCount] := 'Active'
+            else
+              StringGridMain.Cells[2, iGridRowCount] := 'Deactivated';
+          end;
+        end {curAttr <> nil}
+        else StringGridMain.Cells[2, iGridRowCount] := 'Active';
+      end;  {(entries.Items[iEntry].AttributesCount > 0)}
+    end; {for iEntry := 0 to entries.EntriesCount - 1 do}
+  end;  {entries.EntriesCount <> 0}
+  if entries <> nil then
+  begin
+    entries.Destroy;
+    entries := nil;
+  end;
+end;
+
+procedure TMainForm.pvSetEntryInfoToTable(entryName : string);
+var
+  entrType : EntryType;
+  entries : ADEntryList;
+  entry : ADEntry;
+  status : ADSchemaStatus;
+  iGridRowCount, iAttribute, iValue : integer;
+  attribute : ADAttribute;
+begin
+  // set entry info
+  
+  entries := schema.GetEntries('(cn=' + entryName + ')', [], status);
+  //entry := schema.GetEntry(entryName, entrType, status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entry <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries = nil then
+    Exit;
+
+  if entries.EntriesCount <> 1 then
+    Exit;
+
+  entry := entries.Items[0];
+
+  //Fill The Table
+  pvClearStringGridTable;
+
+  StringGridMain.ColCount := 2;
+  StringGridMain.Cells[0,0] := 'Attribute Name';
+  StringGridMain.Cells[1,0] := 'Attribute Value';
+  pvResizeGridColumns;
+  StringGridMain.Options := StringGridMain.Options+[goEditing];
+  StringGridMain.OnSelectCell := StringGridMainSelectCellWithEdit;
+
+  StringGridMain.RowCount := entry.AttributesCount + 1;
+  iGridRowCount := 0;
+  if entry.AttributesCount <> 0 then
+  begin
+    for iAttribute := 0 to entry.AttributesCount - 1 do
+    begin
+      attribute := entry.Attributes[iAttribute];
+
+      if attribute.ValuesCount > 0 then
+      begin
+        if attribute.ValuesCount > 1 then
+          StringGridMain.RowCount := StringGridMain.RowCount + (attribute.ValuesCount-1);
+
+        for iValue := 0 to attribute.ValuesCount - 1 do
+        begin
+          iGridRowCount := iGridRowCount + 1;
+          StringGridMain.Cells[0, iGridRowCount] := attribute.Name;
+
+          StringGridMain.Cells[1, iGridRowCount] := attribute.Values[iValue];
+        end;
+      end;
+
+    end; {for iEntry := 0 to entries.EntriesCount - 1 do}
+  end;  {entries.EntriesCount <> 0}
+  if entry <> nil then
+  begin
+    entry.Destroy;
+    entry := nil;
+  end;
+
+end;
+
+procedure TMainForm.pvSetChildClassesToTable(parentClassName : string);
+var
+  entries : ADEntryList;
+  status : ADSchemaStatus;
+  iEntry, iGridRowCount : integer;
+  curAttrValue : string;
+  curAttr : ADAttribute;
+  filter : string;
+begin
+  //set clild classes 
+
+  if parentClassName = TREE_NODE.Text then
+    filter := '(&(objectClass=classSchema)(cn=top))'
+  else  
+    filter := '(&(objectClass=classSchema)(subClassOf=' + parentClassName + '))';
+  //GET Child Classes
+
+  entries := schema.GetEntries(filter, ['isDefunct', 'objectClassCategory'], status);
+  if status.StatusType <> SuccessStatus then
+  begin
+    pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+    status.Free;
+    status := nil;
+    if entries <> nil then
+    begin
+      entries.Destroy;
+      entries := nil;
+    end;
+    Exit;
+  end;
+  status.Free;
+  status := nil;
+
+  if entries = nil then
+    Exit;
+
+  //Fill The Table
+  pvClearStringGridTable;
+  StringGridMain.ColCount := 3;
+  StringGridMain.Cells[0,0] := 'Class Name';
+  StringGridMain.Cells[1,0] := 'Type';
+  StringGridMain.Cells[2,0] := 'Status';
+  pvResizeGridColumns;
+  StringGridMain.Options := StringGridMain.Options-[goEditing];
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
+
+  StringGridMain.RowCount := entries.EntriesCount + 1;
+  iGridRowCount := 0;
+  if entries.EntriesCount <> 0 then
+  begin
+    for iEntry := 0 to entries.EntriesCount - 1 do
+    begin
+      iGridRowCount := iGridRowCount + 1;
+      StringGridMain.Cells[0, iGridRowCount] := entries.Items[iEntry].Name;
+
+      if (entries.Items[iEntry].AttributesCount > 0) then
+      begin
+        curAttr := entries.Items[iEntry].GetAttributeByName('objectClassCategory');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            curAttrValue := curAttr.Values[0];
+            if curAttrValue = '0' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Type88'
+            else if curAttrValue = '1' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Structural'
+            else if curAttrValue = '2' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Abstract'
+            else if curAttrValue = '3' then
+              StringGridMain.Cells[1, iGridRowCount] := 'Auxiliary';
+          end; {curAttr.ValuesCount > 0}
+        end; {curAttr <> nil}
+        
+        curAttr := entries.Items[iEntry].GetAttributeByName('isDefunct');
+        if curAttr <> nil then
+        begin
+          if curAttr.ValuesCount > 0 then
+          begin
+            if curAttr.Values[0] = 'FALSE' then
+              StringGridMain.Cells[2, iGridRowCount] := 'Active'
+            else
+              StringGridMain.Cells[2, iGridRowCount] := 'Deactivated';
+          end;
+        end {curAttr <> nil}
+        else StringGridMain.Cells[2, iGridRowCount] := 'Active';
+      end;  {(entries.Items[iEntry].AttributesCount > 0)}
+    end; {for iEntry := 0 to entries.EntriesCount - 1 do}
+  end;  {entries.EntriesCount <> 0}
+  if entries <> nil then
+  begin
+    entries.Destroy;
+    entries := nil;
+  end;
+  
+  
+end;
+
+procedure TMainForm.pvClearStringGridTable();
+var
+  i : integer;
+begin
+  with StringGridMain do
+  begin
+    for i:=0 to RowCount-1 do
+      Rows[i].Clear;
+    StringGridMain.RowCount := 2;
+  end;
+
+end;
+
+procedure TMainForm.SaveTable();
+var
+  attrName, attrValue, entryName : string;
+  status : ADSchemaStatus;
+  modEntry : ADEntry;
+  whileRow : integer;
+  attrIndex : integer;
+begin
+  with StringGridMain do
+  begin
+    if Cells[0,3] = 'cn' then
+    begin
+      attrValue := Cells[Col, Row];
+      attrName := Cells[0, Row];
+      entryName := Cells[1,3];
+      modEntry := ADEntry.Create(entryName);
+      attrIndex := modEntry.AddAttribute(attrName, [attrValue]);
+
+      if Cells[0, Row-1] = attrName then
+      begin
+        whileRow := Row-1;
+        while Cells[0, whileRow] = attrName  do
+        begin
+          modEntry.Attributes[attrIndex].AddValue(Cells[1, whileRow]);
+          whileRow := whileRow - 1;
+          if whileRow <= 0 then
+            break;
+        end;
+      end;
+      if (Row+1) < (RowCount-1) then
+        if Cells[0, Row + 1] = attrName then
+        begin
+          whileRow := Row+1;
+          while Cells[0, whileRow] = attrName  do
+          begin
+            modEntry.Attributes[attrIndex].AddValue(Cells[1, whileRow]);
+            whileRow := whileRow + 1;
+            if whileRow > (RowCount-1) then
+              break;
+          end;
+        end;
+
+      status := schema.ModifyEntryAttributes(modEntry);
+      modEntry.Destroy;
+      modEntry := nil;
+      if status.StatusType <> SuccessStatus then
+      begin
+        pvShowErrorDialog(status.StatusNumb, status.StatusMsg);
+      end;
+      status.Free;
+      status := nil;   
+    end;
+  end;
+     
+end;
+
+end.

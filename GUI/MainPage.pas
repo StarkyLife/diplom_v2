@@ -57,8 +57,6 @@ type
     procedure Disconnect1Click(Sender: TObject);
     procedure Connect1Click(Sender: TObject);
     procedure StringGridMainDblClick(Sender: TObject);
-    procedure StringGridMainSelectCell(Sender: TObject; ACol, ARow: Integer;
-      var CanSelect: Boolean);
     procedure StringGridMainSelectCellWithEdit(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
     procedure Activate1Click(Sender: TObject);
@@ -130,6 +128,26 @@ begin
   addForm.schema := schema;
   addForm.isModify := true;
   //TODO: set entry Name
+
+
+
+      with StringGridMain do
+        begin
+          if (rowCount > 1) and (row > 0) then
+          begin
+              addForm.entryName := Cells[0, Row];
+              
+          end else
+            if (TreeViewCurrentNode <> CLASS_NODE) and
+                (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
+                  (TreeViewCurrentNode <> TREE_NODE) then
+                    if TreeViewCurrentNode.Selected then
+                    begin
+                      addForm.entryName := TreeViewCurrentNode.Text;
+                    end;
+        end;  
+
+
   try
     if addForm.ShowModal = mrOk then
       Refresh1.Click;
@@ -223,8 +241,8 @@ procedure TMainForm.Activate1Click(Sender: TObject);
 var status : ADSchemaStatus;
   modEntry : ADEntry;
 begin
-  if StringGridMain.ColCount <> 2 then
-  begin
+  if schema = nil then
+    Exit;
     if (TreeViewCurrentNode <> CLASS_NODE) and
       (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
       (TreeViewCurrentNode <> TREE_NODE) then
@@ -257,7 +275,7 @@ begin
             end;
         end;  
     end;
-  end;
+  
 end;
 
 procedure TMainForm.Add1Click(Sender: TObject);
@@ -285,7 +303,8 @@ procedure TMainForm.Deactivate1Click(Sender: TObject);
 var status : ADSchemaStatus;
   modEntry : ADEntry;
 begin
-  
+  if schema = nil then
+    Exit;
     if (TreeViewCurrentNode <> CLASS_NODE) and
       (TreeViewCurrentNode <> ATTRIBUTE_NODE) and
       (TreeViewCurrentNode <> TREE_NODE) then
@@ -415,12 +434,6 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGridMainSelectCell(Sender: TObject; ACol,
-  ARow: Integer; var CanSelect: Boolean);
-begin
-  //TODO: it makes available Activating and Deactivatig
-end;
-
 procedure TMainForm.StringGridMainSelectCellWithEdit(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
 begin
@@ -468,7 +481,9 @@ var
   curNode, parentNode : TTreeNode;
   test : string;
 begin
-  //Get Attributes     
+  //Get Attributes
+  if schema = nil then
+    Exit;
   entries := schema.GetAll(AttributeEntry, ['cn'], status);     
   if status.StatusType <> SuccessStatus then
   begin
@@ -632,7 +647,7 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
   
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
@@ -723,7 +738,7 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
   
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
@@ -889,7 +904,7 @@ begin
   StringGridMain.Cells[2,0] := 'Status';
   pvResizeGridColumns;
   StringGridMain.Options := StringGridMain.Options-[goEditing];
-  StringGridMain.OnSelectCell := StringGridMainSelectCell;
+  //StringGridMain.OnSelectCell := StringGridMainSelectCell;
 
   StringGridMain.RowCount := entries.EntriesCount + 1;
   iGridRowCount := 0;
