@@ -56,7 +56,6 @@ begin
         entries.Destroy;
       Exit;
     end;
-    status.Free;
 
     if entries = nil then
       Exit;
@@ -72,7 +71,7 @@ begin
       ListBoxSelect.Items.Add(entries.Items[i].Name);
     end;
 
-    entries.Destroy;
+
   end;
 end;
 

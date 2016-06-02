@@ -56,23 +56,15 @@ begin
         entries.Destroy;
       Exit;
     end;
-    status.Free;
-
-    if entries = nil then
-      Exit;
 
     if entries.EntriesCount = 0 then
-    begin
-      entries.Destroy;
       Exit;
-    end;
 
     for i := 0 to entries.EntriesCount - 1 do
     begin
       ListBoxSelect.Items.Add(entries.Items[i].Name);
     end;
-
-    entries.Destroy;
+      
   end;
 end;
 
