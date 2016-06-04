@@ -27,7 +27,9 @@ type
     GroupBox1: TGroupBox;
     OIDLabel: TLabel;
     SyntaxLabel: TLabel;
+    oMSyntaxLabel: TLabel;
     OIDEdit: TEdit;
+    oMSyntaxEdit: TEdit;
     FlowPanel1: TFlowPanel;
     AddOptionButton: TButton;
     SaveBtn: TBitBtn;
@@ -69,8 +71,6 @@ type
     procedure pvSetAvailableAttributes(isAttribute : boolean);
     function pvGetIndexOfComboAttribute(attrName : string) : integer;
     function pvGetIndexOfSyntax(syntaxID, oMSyntax : string) : integer;
-    function pvGetOMSyntax() : string;
-    function pvGetAttributeSyntax() : string;
 
     procedure pvShowErrorDialog(errorNumb: integer; errorMsg: string);
   public
@@ -102,58 +102,6 @@ begin
   end;
 end;
 
-function TAddForm.pvGetOMSyntax() : string;
-begin
-
-  case SyntaxEdit.ItemIndex of
-    0 : result := '1';
-    1 : result := '10';
-    2 : result := '2';
-    3 : result := '65';
-    4-9 : result := '127';
-    10: result := '27';
-    11: result := '24';
-    12: result := '22';
-    13: result := '66';
-    14: result := '18';
-    15: result := '6';
-    16-17: result := '4';
-    18: result := '19';
-    19: result := '20';
-    20: result := '64';
-    21: result := '23';
-  end;
-
-end;
-
-function TAddForm.pvGetAttributeSyntax() : string;
-begin
-  case SyntaxEdit.ItemIndex of
-    0 : result := '2.5.5.8';
-    1 : result := '2.5.5.9';
-    2 : result := '2.5.5.9';
-    3 : result := '2.5.5.16';
-    4 : result := '2.5.5.14';
-    5 : result := '2.5.5.7';
-    6 : result := '2.5.5.14';
-    7 : result := '2.5.5.1';
-    8 : result := '2.5.5.13';
-    9 : result := '2.5.5.10';
-    10: result := '2.5.5.3';
-    11: result := '2.5.5.11';
-    12: result := '2.5.5.5';
-    13: result := '2.5.5.15';
-    14: result := '2.5.5.6';
-    15: result := '2.5.5.2';
-    16: result := '2.5.5.10';
-    17: result := '2.5.5.17';
-    18: result := '2.5.5.5';
-    19: result := '2.5.5.4';
-    20: result := '2.5.5.12';
-    21: result := '2.5.5.11';
-  end;
-end;
-
 procedure TAddForm.SaveBtnClick(Sender: TObject);
 var
   status : ADSchemaStatus;
@@ -177,8 +125,8 @@ begin
     begin 
       newEntry.AddAttribute('objectClass', ['attributeSchema']);
       newEntry.AddAttribute('attributeID', [OIDEdit.Text]);  
-      newEntry.AddAttribute('attributeSyntax', [pvGetAttributeSyntax]);
-      newEntry.AddAttribute('oMSyntax', [pvGetOMSyntax]);    
+      newEntry.AddAttribute('attributeSyntax', [SyntaxEdit.Text]);
+      newEntry.AddAttribute('oMSyntax', [oMSyntaxEdit.Text]);    
     end
     else
     begin
@@ -470,7 +418,7 @@ begin
     ComboBoxType.Enabled := false;
     OIDEdit.Enabled := false;
     SyntaxEdit.Enabled := false;
-    //oMSyntaxEdit.Enabled := false;
+    oMSyntaxEdit.Enabled := false;
     BtnAddMust.Visible := false;
     BtnDeleteMust.Visible := false;
   end;
@@ -486,24 +434,12 @@ begin
     127 :
       begin
         //Object(Access-Point)           2.5.5.14
-        if syntaxID = '2.5.5.14' then
-          result := 4
         //Object(DN-Binary)              2.5.5.7
-        //Object(OR-Name)                2.5.5.7
-        else if syntaxID = '2.5.5.7' then
-          result := 5
         //Object(DN-String)              2.5.5.14
-        else if syntaxID = '2.5.5.14' then
-          result := 6
         //Object(DS-DN)                  2.5.5.1
-        else if syntaxID = '2.5.5.1' then
-          result := 7
+        //Object(OR-Name)                2.5.5.7
         //Object(Presentation-Address)   2.5.5.13
-        else if syntaxID = '2.5.5.13' then
-          result := 8
         //Object(Replica-Link)           2.5.5.10
-        else
-          result := 9;
       end;
     1   :
       begin
@@ -557,9 +493,9 @@ begin
         result := 15;
       end;
     4   :
-      begin        
+      begin
+        //String(Octet)    2.5.5.10
         if syntaxID = '2.5.5.10' then
-          //String(Octet)    2.5.5.10
           result := 16
         else
           //String(Sid)      2.5.5.17
@@ -595,8 +531,7 @@ var
   entries : ADEntryList;
   entry : ADEntry;
   status : ADSchemaStatus;
-  temp : ADAttribute;
-  temp1 : ADAttribute;  
+  temp : ADAttribute;  
   iTemp : integer;
   iAttribute : integer;
 
@@ -654,22 +589,20 @@ begin
             OIDEdit.Text := temp.Values[0];
           entry.DeleteAttribute('attributeID');
         end;
-        
+
+        temp := entry.GetAttributeByName('attributeSyntax');
+        if temp <> nil then
+        begin
+          if temp.ValuesCount > 0 then
+            SyntaxEdit.Text := temp.Values[0];
+          entry.DeleteAttribute('attributeSyntax');
+        end;
+
         temp := entry.GetAttributeByName('oMSyntax');
         if temp <> nil then
         begin
           if temp.ValuesCount > 0 then
-          begin
-            temp1 := entry.GetAttributeByName('attributeSyntax');
-            if temp1 <> nil then
-            begin
-              if temp1.ValuesCount > 0 then
-              begin
-                SyntaxEdit.ItemIndex := pvGetIndexOfSyntax(temp1.Values[0], temp.Values[0]);
-              end;
-              entry.DeleteAttribute('attributeSyntax');
-            end;
-          end;
+            oMSyntaxEdit.Text := temp.Values[0];
           entry.DeleteAttribute('oMSyntax');
         end;
       end

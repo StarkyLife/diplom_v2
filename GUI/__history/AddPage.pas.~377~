@@ -27,7 +27,9 @@ type
     GroupBox1: TGroupBox;
     OIDLabel: TLabel;
     SyntaxLabel: TLabel;
+    oMSyntaxLabel: TLabel;
     OIDEdit: TEdit;
+    oMSyntaxEdit: TEdit;
     FlowPanel1: TFlowPanel;
     AddOptionButton: TButton;
     SaveBtn: TBitBtn;
@@ -129,28 +131,28 @@ end;
 function TAddForm.pvGetAttributeSyntax() : string;
 begin
   case SyntaxEdit.ItemIndex of
-    0 : result := '2.5.5.8';
-    1 : result := '2.5.5.9';
-    2 : result := '2.5.5.9';
-    3 : result := '2.5.5.16';
-    4 : result := '2.5.5.14';
-    5 : result := '2.5.5.7';
-    6 : result := '2.5.5.14';
-    7 : result := '2.5.5.1';
-    8 : result := '2.5.5.13';
-    9 : result := '2.5.5.10';
-    10: result := '2.5.5.3';
-    11: result := '2.5.5.11';
-    12: result := '2.5.5.5';
-    13: result := '2.5.5.15';
-    14: result := '2.5.5.6';
-    15: result := '2.5.5.2';
-    16: result := '2.5.5.10';
-    17: result := '2.5.5.17';
-    18: result := '2.5.5.5';
-    19: result := '2.5.5.4';
-    20: result := '2.5.5.12';
-    21: result := '2.5.5.11';
+    0 : result := '1';
+    1 : result := '10';
+    2 : result := '2';
+    3 : result := '65';
+    4 : result := '127';
+    5 : result := '127';
+    6 : result := '127';
+    7 : result := '127';
+    8 : result := '127';
+    9 : result := '127';
+    10: result := '27';
+    11: result := '24';
+    12: result := '22';
+    13: result := '66';
+    14: result := '18';
+    15: result := '6';
+    16: result := '4';
+    17: result := '4';
+    18: result := '19';
+    19: result := '20';
+    20: result := '64';
+    21: result := '23';
   end;
 end;
 
@@ -177,8 +179,8 @@ begin
     begin 
       newEntry.AddAttribute('objectClass', ['attributeSchema']);
       newEntry.AddAttribute('attributeID', [OIDEdit.Text]);  
-      newEntry.AddAttribute('attributeSyntax', [pvGetAttributeSyntax]);
-      newEntry.AddAttribute('oMSyntax', [pvGetOMSyntax]);    
+      newEntry.AddAttribute('attributeSyntax', [SyntaxEdit.Text]);
+      newEntry.AddAttribute('oMSyntax', [oMSyntaxEdit.Text]);    
     end
     else
     begin
@@ -470,7 +472,7 @@ begin
     ComboBoxType.Enabled := false;
     OIDEdit.Enabled := false;
     SyntaxEdit.Enabled := false;
-    //oMSyntaxEdit.Enabled := false;
+    oMSyntaxEdit.Enabled := false;
     BtnAddMust.Visible := false;
     BtnDeleteMust.Visible := false;
   end;

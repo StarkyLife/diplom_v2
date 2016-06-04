@@ -27,7 +27,9 @@ type
     GroupBox1: TGroupBox;
     OIDLabel: TLabel;
     SyntaxLabel: TLabel;
+    oMSyntaxLabel: TLabel;
     OIDEdit: TEdit;
+    oMSyntaxEdit: TEdit;
     FlowPanel1: TFlowPanel;
     AddOptionButton: TButton;
     SaveBtn: TBitBtn;
@@ -177,8 +179,8 @@ begin
     begin 
       newEntry.AddAttribute('objectClass', ['attributeSchema']);
       newEntry.AddAttribute('attributeID', [OIDEdit.Text]);  
-      newEntry.AddAttribute('attributeSyntax', [pvGetAttributeSyntax]);
-      newEntry.AddAttribute('oMSyntax', [pvGetOMSyntax]);    
+      newEntry.AddAttribute('attributeSyntax', [SyntaxEdit.Text]);
+      newEntry.AddAttribute('oMSyntax', [oMSyntaxEdit.Text]);    
     end
     else
     begin
@@ -470,7 +472,7 @@ begin
     ComboBoxType.Enabled := false;
     OIDEdit.Enabled := false;
     SyntaxEdit.Enabled := false;
-    //oMSyntaxEdit.Enabled := false;
+    oMSyntaxEdit.Enabled := false;
     BtnAddMust.Visible := false;
     BtnDeleteMust.Visible := false;
   end;

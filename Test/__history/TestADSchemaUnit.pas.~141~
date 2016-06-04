@@ -49,10 +49,10 @@ procedure TestADSchema.SetUp;
 begin
   FADSchema := ADSchema.Create;
   TestPortNumber := 389;
-  TestHostName := 'starkyli-1sqlu0.domain.local';
+  TestHostName := 'Ilshat-2008.mydomain.com';
   TestPassword := 'pa$$w0rd';
   //userDN := 'CN=Ilshat,CN=Users,DC=domain,DC=local';
-  TestUserDN := 'starkylife@domain.local';
+  TestUserDN := 'starky@mydomain.com';
 end;
 
 procedure TestADSchema.TearDown;
@@ -238,11 +238,10 @@ var
   modifiedEntry: ADEntry;
   status: ADSchemaStatus;
 begin
-  modifiedEntry := ADEntry.Create('MyTest2');
+  modifiedEntry := ADEntry.Create('MyTest3');
   //modifiedEntry.AddAttribute('objectClassCategory', ['1']); { not allowed to change }
-  //modifiedEntry.AddAttribute('isDefunct', ['FALSE']);
+  modifiedEntry.AddAttribute('isDefunct', ['FALSE']);
   //modifiedEntry.AddAttribute('adminDescription', ['hey hey hey']);
-  modifiedEntry.AddAttribute('subClassOf', ['MyTest']);
   // DONE: Setup method call parameters
   FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
   status.Free;

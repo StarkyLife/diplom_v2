@@ -49,10 +49,10 @@ procedure TestADSchema.SetUp;
 begin
   FADSchema := ADSchema.Create;
   TestPortNumber := 389;
-  TestHostName := 'starkyli-1sqlu0.domain.local';
+  TestHostName := 'Ilshat-2008.mydomain.com';
   TestPassword := 'pa$$w0rd';
   //userDN := 'CN=Ilshat,CN=Users,DC=domain,DC=local';
-  TestUserDN := 'starkylife@domain.local';
+  TestUserDN := 'starky@mydomain.com';
 end;
 
 procedure TestADSchema.TearDown;
@@ -92,7 +92,7 @@ var
   CNname: string;
   test : string;
 begin
-  CNname := 'MyTest';
+  CNname := 'user';
   entrType := ClassEntry;
 
   // DONE: Setup method call parameters
@@ -114,7 +114,7 @@ var
   entrType: EntryType;
   CNname: string;
 begin
-  CNname := 'account';
+  CNname := 'user';
   entrType := ClassEntry;
   SetLength(withAttr, 1);
   withAttr[0] := 'mustContain';
@@ -205,11 +205,11 @@ begin
   //newEntry.AddAttribute('isSingleValued', ['TRUE']);
 
   { Class ADD }
-  newEntryClass := ADEntry.Create('MyTestSubClass');
-  newEntryClass.AddAttribute('cn', ['MyTestSubClass']);
+  newEntryClass := ADEntry.Create('MyTest');
+  newEntryClass.AddAttribute('cn', ['MyTest']);
   newEntryClass.AddAttribute('objectClass', ['classSchema']);
-  newEntryClass.AddAttribute('governsID', ['1.2.840.113556.1.8000.2554.13844.27782.13802.18569.40486.16667616.15992150']);
-  newEntryClass.AddAttribute('mustContain', ['MyTest3']);
+  newEntryClass.AddAttribute('governsID', ['1.2.840.113556.1.8000.2554.13844.27782.13802.18569.40486.16667616.15992144']);
+  //newEntryClass.AddAttribute('mustContain', ['MyTest3']);
 
   { You can add if u want }
   //newEntry.AddAttribute('subClassOf', ['top']);      
@@ -238,11 +238,10 @@ var
   modifiedEntry: ADEntry;
   status: ADSchemaStatus;
 begin
-  modifiedEntry := ADEntry.Create('MyTest2');
+  modifiedEntry := ADEntry.Create('MyTest3');
   //modifiedEntry.AddAttribute('objectClassCategory', ['1']); { not allowed to change }
   modifiedEntry.AddAttribute('isDefunct', ['FALSE']);
   //modifiedEntry.AddAttribute('adminDescription', ['hey hey hey']);
-  //modifiedEntry.AddAttribute('subClassOf', ['MyTest']);    //no user modifications
   // DONE: Setup method call parameters
   FADSchema.Connect(TestHostName, TestUserDN, TestPassword, TestPortNumber, status);
   status.Free;
